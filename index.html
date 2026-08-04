@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZOMORODA.BOUTIQUE - عبايات فاخرة</title>
+    <meta name="description" content="تسوقي أحدث صيحات العبايات الفاخرة والمطرزة يدويًا من ZOMORODA.BOUTIQUE.">
+    <meta name="theme-color" content="#111111">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #111111;
+            --accent: #D4AF37;
+            --accent-hover: #AA8B22;
+            --bg: #FAF9F6;
+            --card-bg: #FFFFFF;
+            --border: #EAEAEA;
+            --text-muted: #666666;
+            --danger: #e74c3c;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 24px;
+            --radius-full: 999px;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
+            --shadow-float: 0 15px 35px rgba(0,0,0,0.12);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #0d0d0d; color: var(--primary); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+        .app-container {
+            width: 100%; max-width: 480px; height: 100vh; max-height: 932px;
+            background: var(--bg); position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        @media (max-width: 480px) { .app-container { height: 100vh; max-height: none; } }
+
+        /* الهيدر العلوي */
+        header {
+            position: sticky; top: 0; background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            padding: 12px 18px; border-bottom: 1px solid var(--border); z-index: 100;
+            transition: var(--transition);
+        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .logo { 
+            font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; 
+            background: linear-gradient(45deg, #111, var(--accent)); -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; cursor: pointer; transition: var(--transition); 
+        }
+        .logo:active { transform: scale(0.95); opacity: 0.8; }
+        
+        .header-actions { display: flex; gap: 14px; align-items: center; }
+        
+        .icon-btn { 
+            position: relative; background: none; border: none; font-size: 1.25rem; 
+            color: var(--primary); cursor: pointer; transition: var(--transition-bounce); 
+            display: flex; align-items: center; justify-content: center; text-decoration: none;
+        }
+        .icon-btn:active { transform: scale(0.82); }
+        .icon-btn.cart-shake { animation: cartBounce 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+        .badge {
+            position: absolute; top: -6px; right: -8px; background: var(--accent); color: #fff;
+            font-size: 0.65rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; border: 2px solid #fff;
+            transition: var(--transition-bounce);
+        }
+
+        /* البحث والفلترة */
+        .search-section { margin-top: 10px; display: none; }
+        .search-section.active { display: block; animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .search-box { position: relative; }
+        .search-input {
+            width: 100%; padding: 10px 16px 10px 40px; border-radius: var(--radius-full); border: 1px solid var(--border);
+            background: #F2F0EB; font-size: 0.85rem; outline: none; transition: var(--transition);
+        }
+        .search-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 12px rgba(212,175,55,0.2); }
+
+        /* الشاشات (Pages) */
+        .page { flex: 1; overflow-y: auto; display: none; padding: 16px; scroll-behavior: smooth; }
+        .page.active { display: block; animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .filter-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; margin-bottom: 12px; }
+        .filter-tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            padding: 6px 16px; border-radius: var(--radius-full); border: 1px solid var(--border); background: #fff;
+            font-size: 0.8rem; font-weight: 600; white-space: nowrap; cursor: pointer; transition: var(--transition);
+        }
+        .tab-btn:active { transform: scale(0.92); }
+        .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+        /* كروت المنتجات */
+        .products-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .product-card {
+            background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden;
+            border: 1px solid var(--border); box-shadow: var(--shadow-soft); transition: var(--transition); position: relative;
+            opacity: 0; transform: translateY(25px);
+        }
+        .product-card.reveal {
+            opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .product-card:hover, .product-card:active {
+            transform: translateY(-4px); box-shadow: 0 15px 35px rgba(212,175,55,0.12); border-color: rgba(212,175,55,0.4);
+        }
+
+        /* سلايدر الصور */
+        .carousel-container {
+            position: relative; width: 100%; height: 380px; overflow: hidden; background: #f5f5f5;
+        }
+        .carousel-track {
+            display: flex; width: 100%; height: 100%; transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .carousel-slide { min-width: 100%; height: 100%; position: relative; }
+        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.6s ease; }
+        .carousel-slide img:active { transform: scale(1.03); }
+
+        /* أسهم التنقل للسلايدر */
+        .carousel-arrow {
+            position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px;
+            background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(6px); border: none; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5;
+            color: var(--primary); font-size: 0.9rem; transition: var(--transition-bounce); box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        .carousel-arrow:active { transform: translateY(-50%) scale(0.8); background: #fff; }
+        .carousel-arrow.prev { right: 10px; }
+        .carousel-arrow.next { left: 10px; }
+
+        /* نقاط المؤشر السفلية (Dots) */
+        .carousel-dots {
+            position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px; z-index: 5; background: rgba(0, 0, 0, 0.35); padding: 4px 10px;
+            border-radius: var(--radius-full); backdrop-filter: blur(4px);
+        }
+        .dot {
+            width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); transition: var(--transition-bounce);
+        }
+        .dot.active { background: var(--accent); width: 18px; border-radius: 10px; }
+
+        .wishlist-btn {
+            position: absolute; top: 12px; left: 12px; width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,0.9); border: none; color: #ccc; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; font-size: 1rem; transition: var(--transition-bounce); backdrop-filter: blur(5px); z-index: 4;
+        }
+        .wishlist-btn:active { transform: scale(0.75); }
+        .wishlist-btn.active { color: #e74c3c; animation: heartBeat 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        .card-info { padding: 16px; }
+        .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; color: var(--primary); }
+        .card-price { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+
+        /* الأزرار والنماذج */
+        .btn {
+            width: 100%; padding: 12px; border-radius: var(--radius-full); border: none;
+            font-weight: 700; cursor: pointer; transition: var(--transition-bounce); display: flex;
+            align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; position: relative; overflow: hidden;
+            text-decoration: none;
+        }
+        .btn:active { transform: scale(0.96); opacity: 0.9; }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-accent { background: var(--accent); color: #fff; box-shadow: 0 4px 15px rgba(212,175,55,0.3); }
+        .btn-whatsapp { background: #25D366; color: #fff; font-size: 1rem; box-shadow: 0 4px 15px rgba(37,211,102,0.3); }
+
+        /* دوائر الألوان */
+        .colors-group { display: flex; gap: 12px; margin: 12px 0 20px 0; align-items: center; }
+        .color-circle {
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+            position: relative; transition: var(--transition-bounce); border: 2px solid transparent;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center;
+        }
+        .color-circle:active { transform: scale(0.85); }
+        .color-circle.active { transform: scale(1.15); border-color: var(--accent); box-shadow: 0 0 10px rgba(212,175,55,0.4); }
+        .color-circle.active::after {
+            content: '✓'; color: #fff; font-size: 0.75rem; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .cart-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border-radius: var(--radius-md); 
+            margin-bottom: 12px; border: 1px solid var(--border); transition: var(--transition); animation: fadeIn 0.3s ease;
+        }
+        .cart-item img { width: 65px; height: 80px; object-fit: cover; border-radius: var(--radius-sm); }
+        .cart-controls { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+        .cart-controls button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--border); background: #fff; cursor: pointer; font-weight: bold; transition: var(--transition-bounce); }
+        .cart-controls button:active { transform: scale(0.8); background: #f0f0f0; }
+
+        .form-group { margin-bottom: 14px; position: relative; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+        .form-group input {
+            width: 100%; padding: 12px 14px; border-radius: var(--radius-md); border: 1px solid var(--border);
+            font-size: 0.9rem; outline: none; background: #fff; transition: var(--transition);
+        }
+        .form-group input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(212,175,55,0.15); }
+        .form-group input.invalid { border-color: var(--danger) !important; background: #fff5f5; animation: shake 0.4s ease; }
+        .error-msg { color: var(--danger); font-size: 0.75rem; font-weight: 600; margin-top: 4px; display: none; }
+        .error-msg.active { display: block; animation: fadeIn 0.3s ease; }
+
+        /* قسم التواصل في أسفل الموقع فقط (Footer) */
+        .global-contact-section {
+            background: linear-gradient(180deg, #181818 0%, #111111 100%);
+            color: #ffffff;
+            padding: 28px 18px;
+            margin: 32px -16px -16px -16px;
+            border-top: 2px solid var(--accent);
+            text-align: center;
+        }
+        .contact-brand {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+        .contact-subtext {
+            font-size: 0.8rem;
+            color: #aaaaaa;
+            margin-bottom: 16px;
+        }
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+        .contact-btn-link {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--radius-full);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.88rem;
+            transition: var(--transition-bounce);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .contact-btn-link:active { transform: scale(0.95); }
+        .btn-link-whatsapp {
+            background: rgba(37, 211, 102, 0.12);
+            color: #25D366;
+            border: 1px solid rgba(37, 211, 102, 0.4);
+        }
+        .btn-link-instagram {
+            background: linear-gradient(45deg, rgba(225,48,108,0.15), rgba(253,29,29,0.15));
+            color: #E1306C;
+            border: 1px solid rgba(225,48,108,0.4);
+        }
+        .contact-btn-link i { font-size: 1.1rem; }
+
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: rgba(17, 17, 17, 0.95); color: #fff; padding: 12px 24px; border-radius: var(--radius-full);
+            font-size: 0.85rem; font-weight: 600; box-shadow: var(--shadow-float); z-index: 1000;
+            transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 8px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(212,175,55,0.4);
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        .image-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000; display: none;
+            align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease;
+        }
+        .image-modal img { max-width: 100%; max-height: 90vh; border-radius: var(--radius-md); object-fit: contain; animation: zoomIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        .close-modal { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 1.8rem; cursor: pointer; transition: var(--transition); }
+        .close-modal:active { transform: scale(0.8); }
+
+        /* Keyframes */
+        @keyframes pageEnter {
+            from { opacity: 0; transform: scale(0.98) translateY(12px); filter: blur(4px); }
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.85); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.35); }
+            60% { transform: scale(0.85); }
+            100% { transform: scale(1); }
+        }
+        @keyframes cartBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            20% { transform: translateY(-8px) scale(1.15); }
+            40% { transform: translateY(2px) scale(0.9); }
+            60% { transform: translateY(-4px) scale(1.05); }
+            80% { transform: translateY(0) scale(0.98); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toastNotification"><i class="fa-solid fa-circle-check" style="color:var(--accent);"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
+
+    <!-- مودال التكبير -->
+    <div class="image-modal" id="imageModal">
+        <span class="close-modal" onclick="closeImageModal()">&times;</span>
+        <img id="modalImg" src="" alt="تكبير صورة العباية">
+    </div>
+
+    <div class="app-container">
+        <!-- الهيدر -->
+        <header>
+            <div class="header-top">
+                <div class="logo" onclick="showPage('homePage')">ZOMORODA.BOUTIQUE</div>
+                <div class="header-actions">
+                    <button class="icon-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <button class="icon-btn" onclick="showPage('wishlistPage')">
+                        <i class="fa-solid fa-heart"></i>
+                        <span class="badge" id="wishlistBadge">0</span>
+                    </button>
+                    <button class="icon-btn" id="cartHeaderBtn" onclick="showPage('cartPage')">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span class="badge" id="cartBadge">0</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="search-section" id="searchSection">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ابحثي باسم العباية أو القماش..." oninput="handleSearch(this.value)">
+                </div>
+            </div>
+        </header>
+
+        <!-- 1. الرئيسية -->
+        <main class="page active" id="homePage">
+            <div class="filter-tabs">
+                <button class="tab-btn active" onclick="filterCategory('all', this)">الكل</button>
+                <button class="tab-btn" onclick="filterCategory('new', this)">وصل حديثاً ✨</button>
+                <button class="tab-btn" onclick="filterCategory('best', this)">الأكثر مبيعاً 🔥</button>
+            </div>
+
+            <div class="products-grid" id="productsGrid"></div>
+
+            <!-- قسم التواصل مدمج في أسفل الصفحة فقط -->
+            <footer class="global-contact-section">
+                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
+                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
+                <div class="contact-links">
+                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>تواصل عبر واتساب: +212777647921</span>
+                    </a>
+                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
+                    </a>
+                </div>
+            </footer>
+        </main>
+
+        <!-- 2. صفحة تفاصيل المنتج PDP -->
+        <div class="page" id="pdpPage">
+            <button class="btn" style="width: auto; background: none; color: var(--primary); padding: 0 0 12px 0; font-size: 0.9rem;" onclick="showPage('homePage')">
+                <i class="fa-solid fa-arrow-right"></i> العودة للمتجر
+            </button>
+            <div id="pdpContent"></div>
+            
+            <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 14px;">منتجات مشابهة قد تعجبكِ</h3>
+                <div class="products-grid" id="relatedProductsGrid"></div>
+            </div>
+
+            <footer class="global-contact-section">
+                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
+                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
+                <div class="contact-links">
+                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>تواصل عبر واتساب: +212777647921</span>
+                    </a>
+                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
+                    </a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- 3. المفضلة -->
+        <div class="page" id="wishlistPage">
+            <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;">المفضلة ❤️</h2>
+            <div id="wishlistList"></div>
+
+            <footer class="global-contact-section">
+                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
+                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
+                <div class="contact-links">
+                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>تواصل عبر واتساب: +212777647921</span>
+                    </a>
+                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
+                    </a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- 4. سلة التسوق -->
+        <div class="page" id="cartPage">
+            <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;">حقيبة التسوق 🛍️</h2>
+            <div id="cartItemsList"></div>
+            
+            <div id="cartSummary" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
+                <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 1.15rem; margin-bottom: 16px;">
+                    <span>المجموع النهائي:</span>
+                    <span id="cartTotal" style="color:var(--accent);">0 ر.س</span>
+                </div>
+                <button class="btn btn-primary" onclick="showPage('checkoutPage')">المتابعة لإتمام الطلب</button>
+            </div>
+
+            <footer class="global-contact-section">
+                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
+                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
+                <div class="contact-links">
+                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>تواصل عبر واتساب: +212777647921</span>
+                    </a>
+                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
+                    </a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- 5. إتمام الطلب -->
+        <div class="page" id="checkoutPage">
+            <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;">بيانات التوصيل 🚚</h2>
+            <form onsubmit="processWhatsAppOrder(event)">
+                <div class="form-group">
+                    <label>الاسم الكامل *</label>
+                    <input type="text" id="custName" required placeholder="أدخلي اسمكِ الكريم">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف *</label>
+                    <input type="tel" id="custPhone" required placeholder="06xxxxxxxx أو 07xxxxxxxx أو 05xxxxxxxx" maxlength="10" oninput="formatPhoneInput(this)">
+                    <div class="error-msg" id="phoneError">عفواً، يجب أن يتكون الرقم من 10 أرقام ويبدأ بـ (05 أو 06 أو 07) حصراً.</div>
+                </div>
+                <div class="form-group">
+                    <label>المدينة *</label>
+                    <input type="text" id="custCity" required placeholder="اسم المدينة">
+                </div>
+                <div class="form-group">
+                    <label>العنوان الكامل *</label>
+                    <input type="text" id="custAddress" required placeholder="اسم الحي، الشارع، رقم المنزل">
+                </div>
+
+                <button type="submit" class="btn btn-whatsapp" style="margin-top: 16px; padding: 14px;">
+                    <i class="fa-brands fa-whatsapp"></i> إرسال الطلب عبر WhatsApp
+                </button>
+            </form>
+
+            <footer class="global-contact-section">
+                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
+                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
+                <div class="contact-links">
+                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>تواصل عبر واتساب: +212777647921</span>
+                    </a>
+                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
+                        <i class="fa-brands fa-instagram"></i>
+                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
+                    </a>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const WHATSAPP_NUMBER = "212777647921"; 
+        const INSTAGRAM_URL = "https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr"; 
+
+        const products = [
+            {
+                id: "p1",
+                name: "عباية الحرير الأسود المطرزة يدوياً",
+                price: 850,
+                tag: "best",
+                colors: [
+                    { name: "أسود ملكي", hex: "#111111" },
+                    { name: "كحلي داكن", hex: "#0F172A" },
+                    { name: "زيتي فاخر", hex: "#2A3B28" }
+                ],
+                images: [
+                    "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800",
+                    "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800",
+                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800",
+                    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800"
+                ],
+                desc: "تصميم فاخر من الحرير الإيطالي الناعم المزود بتطريز خيوط القصب الذهبية اليدوية مع طقطق مخفي."
+            },
+            {
+                id: "p2",
+                name: "عباية المخمل الملكي بكريستال فاخر",
+                price: 1100,
+                tag: "new",
+                colors: [
+                    { name: "أسود فاحم", hex: "#050505" },
+                    { name: "عنابي ملكي", hex: "#58111A" },
+                    { name: "بني دافئ", hex: "#3D2314" }
+                ],
+                images: [
+                    "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800",
+                    "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800",
+                    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800",
+                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800"
+                ],
+                desc: "عباية مخملية فاخرة مرصعة بأحجار الكريستال النمساوي الشفاف لمناسباتكِ الليلية الفاخرة."
+            },
+            {
+                id: "p3",
+                name: "عباية الكتان البيج بياقة مطوية",
+                price: 690,
+                tag: "new",
+                colors: [
+                    { name: "بيج دافئ", hex: "#D7C4B7" },
+                    { name: "رمادي فاتح", hex: "#B8B8B8" },
+                    { name: "أوف وايت", hex: "#F5F2EB" }
+                ],
+                images: [
+                    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800",
+                    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800",
+                    "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?q=80&w=800",
+                    "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=800"
+                ],
+                desc: "تصميم عصري كلاسيكي باللون البيج الدافئ، مصنوعة من الكتان الطبيعي الفاخر المناسب لجميع الأوقات."
+            }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('zomoroda_cart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('zomoroda_wishlist')) || [];
+        let activeProduct = null;
+        let selectedColor = '';
+        let carouselStates = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(products);
+            updateBadges();
+            renderCart();
+            renderWishlist();
+            initScrollReveal();
+        });
+
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(p => p.classList.remove('active'));
+            
+            const targetPage = document.getElementById(pageId);
+            targetPage.classList.add('active');
+            targetPage.scrollTop = 0;
+
+            setTimeout(triggerScrollReveal, 100);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        function toggleSearch() {
+            const sec = document.getElementById('searchSection');
+            sec.classList.toggle('active');
+            if (sec.classList.contains('active')) document.getElementById('searchInput').focus();
+        }
+
+        function handleSearch(q) {
+            const filtered = products.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.desc.includes(q));
+            renderProducts(filtered);
+        }
+
+        function filterCategory(category, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (category === 'all') renderProducts(products);
+            else renderProducts(products.filter(p => p.tag === category));
+        }
+
+        function moveSlide(sliderId, direction, event) {
+            if(event) event.stopPropagation();
+
+            if (carouselStates[sliderId] === undefined) carouselStates[sliderId] = 0;
+
+            const totalSlides = 4;
+            let currentIndex = carouselStates[sliderId];
+
+            if (direction === 'next') {
+                currentIndex = (currentIndex + 1) % totalSlides;
+            } else {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            }
+
+            carouselStates[sliderId] = currentIndex;
+            updateCarouselUI(sliderId, currentIndex);
+        }
+
+        function updateCarouselUI(sliderId, index) {
+            const track = document.getElementById(`track-${sliderId}`);
+            if (track) {
+                track.style.transform = `translateX(${index * 100}%)`;
+            }
+
+            const dots = document.querySelectorAll(`#dots-${sliderId} .dot`);
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function generateCarouselHTML(id, images, isPDP = false) {
+            const sliderId = isPDP ? `pdp-${id}` : `grid-${id}`;
+            const currentIdx = carouselStates[sliderId] || 0;
+
+            return `
+                <div class="carousel-container" style="${isPDP ? 'height: 420px; border-radius: var(--radius-lg);' : ''}">
+                    <button class="carousel-arrow prev" onclick="moveSlide('${sliderId}', 'prev', event)"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button class="carousel-arrow next" onclick="moveSlide('${sliderId}', 'next', event)"><i class="fa-solid fa-chevron-left"></i></button>
+
+                    <div class="carousel-track" id="track-${sliderId}" style="transform: translateX(${currentIdx * 100}%);">
+                        ${images.map(img => `
+                            <div class="carousel-slide">
+                                <img src="${img}" alt="صورة العباية" ${isPDP ? `onclick="openImageModal('${img}')"` : `onclick="openPDP('${id}')"`}>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="carousel-dots" id="dots-${sliderId}">
+                        ${images.map((_, i) => `<div class="dot ${i === currentIdx ? 'active' : ''}"></div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        let revealObserver;
+        function initScrollReveal() {
+            revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('reveal');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            triggerScrollReveal();
+        }
+
+        function triggerScrollReveal() {
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                if (revealObserver) revealObserver.observe(card);
+                else card.classList.add('reveal');
+            });
+        }
+
+        function renderProducts(list) {
+            const grid = document.getElementById('productsGrid');
+            if(list.length === 0) {
+                grid.innerHTML = `<p style="text-align:center; grid-column: 1/-1; padding:30px; color:var(--text-muted);">لا توجد نتائج مطابقة لبحثكِ.</p>`;
+                return;
+            }
+            grid.innerHTML = list.map(p => {
+                const isWish = wishlist.includes(p.id);
+                return `
+                    <div class="product-card">
+                        ${generateCarouselHTML(p.id, p.images, false)}
+                        
+                        <button class="wishlist-btn ${isWish ? 'active' : ''}" onclick="toggleWishlist('${p.id}', event)">
+                            <i class="fa-${isWish ? 'solid' : 'regular'} fa-heart"></i>
+                        </button>
+                        
+                        <div class="card-info">
+                            <div class="card-title">${p.name}</div>
+                            <div class="card-price">${p.price} ر.س</div>
+                            <div style="margin-top: 12px;">
+                                <button class="btn btn-primary" onclick="openPDP('${p.id}')">استعراض العباية والتفاصيل</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            setTimeout(triggerScrollReveal, 50);
+        }
+
+        function openPDP(id) {
+            activeProduct = products.find(p => p.id === id);
+            if (!activeProduct) return;
+
+            selectedColor = activeProduct.colors[0].name;
+
+            const pdpContent = document.getElementById('pdpContent');
+            pdpContent.innerHTML = `
+                ${generateCarouselHTML(activeProduct.id, activeProduct.images, true)}
+
+                <h1 style="font-size:1.2rem; font-weight:800; margin-top:16px;">${activeProduct.name}</h1>
+                <div style="font-size:1.25rem; font-weight:800; color:var(--accent); margin: 6px 0;">${activeProduct.price} ر.س</div>
+                <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.6; margin-bottom:16px;">${activeProduct.desc}</p>
+
+                <div style="margin-bottom:16px;">
+                    <label style="font-weight:700; font-size:0.85rem;">اللون المختار: <span id="colorLabel" style="color:var(--accent);">${selectedColor}</span></label>
+                    <div class="colors-group">
+                        ${activeProduct.colors.map((c, idx) => `
+                            <div class="color-circle ${idx === 0 ? 'active' : ''}" 
+                                 style="background-color: ${c.hex};" 
+                                 title="${c.name}"
+                                 onclick="selectColor(this, '${c.name}')">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <button class="btn btn-accent" onclick="addToCartCurrent()"><i class="fa-solid fa-bag-shopping"></i> إضافة إلى الحقيبة</button>
+            `;
+
+            const related = products.filter(p => p.id !== activeProduct.id);
+            const relatedGrid = document.getElementById('relatedProductsGrid');
+            relatedGrid.innerHTML = related.map(p => `
+                <div class="product-card">
+                    ${generateCarouselHTML(p.id, p.images, false)}
+                    <div class="card-info">
+                        <div class="card-title">${p.name}</div>
+                        <div class="card-price">${p.price} ر.س</div>
+                    </div>
+                </div>
+            `).join('');
+
+            showPage('pdpPage');
+        }
+
+        function selectColor(el, colorName) {
+            document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            selectedColor = colorName;
+            const label = document.getElementById('colorLabel');
+            if(label) label.innerText = colorName;
+        }
+
+        function toggleWishlist(id, event) {
+            if(event) event.stopPropagation();
+            const idx = wishlist.indexOf(id);
+            if (idx > -1) {
+                wishlist.splice(idx, 1);
+                showToast('تمت إزالة المنتج من المفضلة');
+            } else {
+                wishlist.push(id);
+                showToast('تمت إضافة المنتج للمفضلة ❤️');
+            }
+            localStorage.setItem('zomoroda_wishlist', JSON.stringify(wishlist));
+            updateBadges();
+            renderProducts(products);
+            renderWishlist();
+        }
+
+        function renderWishlist() {
+            const list = document.getElementById('wishlistList');
+            const wishProducts = products.filter(p => wishlist.includes(p.id));
+
+            if (wishProducts.length === 0) {
+                list.innerHTML = `<p style="text-align:center; padding: 40px 0; color: var(--text-muted);">لا توجد عناصر بالمفضلة حتى الآن.</p>`;
+                return;
+            }
+
+            list.innerHTML = wishProducts.map(p => `
+                <div class="cart-item">
+                    <img src="${p.images[0]}">
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:0.85rem;">${p.name}</div>
+                        <div style="color:var(--accent); font-weight:800;">${p.price} ر.س</div>
+                    </div>
+                    <button class="btn btn-primary" style="width:auto; padding: 8px 14px; font-size:0.75rem;" onclick="openPDP('${p.id}')">عرض</button>
+                    <button onclick="toggleWishlist('${p.id}')" style="background:none; border:none; color:#ccc; cursor:pointer; padding: 0 8px;"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function triggerCartIconAnimation() {
+            const cartBtn = document.getElementById('cartHeaderBtn');
+            cartBtn.classList.remove('cart-shake');
+            void cartBtn.offsetWidth; 
+            cartBtn.classList.add('cart-shake');
+        }
+
+        function addToCartCurrent() {
+            const existing = cart.find(i => i.id === activeProduct.id && i.color === selectedColor);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({
+                    id: activeProduct.id,
+                    name: activeProduct.name,
+                    price: activeProduct.price,
+                    color: selectedColor,
+                    image: activeProduct.images[0],
+                    qty: 1
+                });
+            }
+            saveCart();
+            triggerCartIconAnimation();
+            showToast('تمت إضافة العباية إلى الحقيبة 🛍️');
+            showPage('cartPage');
+        }
+
+        function updateCartQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            saveCart();
+        }
+
+        function removeCartItem(index) {
+            cart.splice(index, 1);
+            saveCart();
+        }
+
+        function saveCart() {
+            localStorage.setItem('zomoroda_cart', JSON.stringify(cart));
+            updateBadges();
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cartItemsList');
+            const summary = document.getElementById('cartSummary');
+
+            if (cart.length === 0) {
+                list.innerHTML = `<p style="text-align:center; padding: 40px 0; color: var(--text-muted);">حقيبة التسوق فارغة حالياً</p>`;
+                summary.style.display = 'none';
+                return;
+            }
+
+            summary.style.display = 'block';
+            let total = 0;
+
+            list.innerHTML = cart.map((item, idx) => {
+                const itemTotal = item.price * item.qty;
+                total += itemTotal;
+                return `
+                    <div class="cart-item">
+                        <img src="${item.image}">
+                        <div style="flex:1;">
+                            <div style="font-weight:700; font-size:0.85rem;">${item.name}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">اللون: ${item.color}</div>
+                            <div style="font-weight:800; color:var(--accent);">${itemTotal} ر.س</div>
+                            <div class="cart-controls">
+                                <button onclick="updateCartQty(${idx}, -1)">-</button>
+                                <span>${item.qty}</span>
+                                <button onclick="updateCartQty(${idx}, 1)">+</button>
+                            </div>
+                        </div>
+                        <button onclick="removeCartItem(${idx})" style="background:none; border:none; color:red; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('cartTotal').innerText = `${total} ر.س`;
+        }
+
+        function updateBadges() {
+            document.getElementById('cartBadge').innerText = cart.reduce((sum, i) => sum + i.qty, 0);
+            document.getElementById('wishlistBadge').innerText = wishlist.length;
+        }
+
+        function openImageModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        function formatPhoneInput(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+            const errorEl = document.getElementById('phoneError');
+            input.classList.remove('invalid');
+            errorEl.classList.remove('active');
+        }
+
+        function validatePhoneNumber(phone) {
+            const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+            return phoneRegex.test(phone);
+        }
+
+        function processWhatsAppOrder(e) {
+            e.preventDefault();
+            if (cart.length === 0) return alert('السلة فارغة!');
+
+            const phoneInput = document.getElementById('custPhone');
+            const phoneError = document.getElementById('phoneError');
+            const phoneValue = phoneInput.value.trim();
+
+            if (!validatePhoneNumber(phoneValue)) {
+                phoneInput.classList.add('invalid');
+                phoneError.classList.add('active');
+                phoneInput.focus();
+                return;
+            }
+
+            const name = document.getElementById('custName').value;
+            const city = document.getElementById('custCity').value;
+            const address = document.getElementById('custAddress').value;
+
+            let itemsText = "";
+            let grandTotal = 0;
+
+            cart.forEach((item) => {
+                const totalItemPrice = item.price * item.qty;
+                grandTotal += totalItemPrice;
+                itemsText += `- اسم المنتج: ${item.name}\n`;
+                itemsText += `  اللون المختار: ${item.color}\n`;
+                itemsText += `  الكمية: ${item.qty}\n`;
+                itemsText += `  السعر: ${totalItemPrice} ر.س\n\n`;
+            });
+
+            const message = `مرحباً متجر ZOMORODA.BOUTIQUE، أريد طلب المنتجات التالية:\n\n${itemsText}المجموع النهائي: ${grandTotal} ر.س\n\nالاسم: ${name}\nرقم الهاتف: ${phoneValue}\nالمدينة: ${city}\nالعنوان: ${address}\n\nشكراً لكم.`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
+        }
+    </script>
+</body>
+</html>
