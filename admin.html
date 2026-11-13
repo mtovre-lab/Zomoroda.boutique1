@@ -67,7 +67,7 @@ button.danger{background:#b93232;color:white}
 <label for="productAvailability">حالة المنتج</label>
 <select id="productAvailability">
   <option value="true">متوفر</option>
-  <option value="false">غير متوفر</option>
+  <option value="false"> نفدت الكمية</option>
 </select>
 <select id="productTag">
 <option value="new">جديد</option>
@@ -263,7 +263,7 @@ async function loadProducts() {
    <strong>${escapeHTML(p.name)}</strong>
    <p>${p.discountActive && Number(p.originalPrice) > Number(p.price)
       ? `<del>${escapeHTML(p.originalPrice)} د.م</del> <strong>${escapeHTML(p.price)} د.م</strong>`
-      : `${escapeHTML(p.price)} د.م`} | ${p.available === false ? "غير متوفر" : "متوفر"} | ${escapeHTML(p.tag)}</p>
+      : `${escapeHTML(p.price)} د.م`} | ${p.available === false ? " نفدت الكمية" : "متوفر"} | ${escapeHTML(p.tag)}</p>
    <button data-edit="${item.id}">تعديل</button>
    <button class="danger" data-delete="${item.id}">حذف</button>
   `;

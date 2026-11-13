@@ -617,7 +617,7 @@ window.replaceStoreProducts = function(remoteProducts) {
         const priceMarkup = p => p.discountActive && Number(p.originalPrice) > Number(p.price)
             ? `<div class="price-line"><span class="old-price">${money(p.originalPrice)}</span><span class="current-price">${money(p.price)}</span></div>`
             : `<div class="current-price">${money(p.price)}</div>`;
-        const availabilityMarkup = p => `<span class="availability-badge ${p.available === false ? 'unavailable' : 'available'}">${p.available === false ? 'غير متوفر' : 'متوفر'}</span>`;
+        const availabilityMarkup = p => `<span class="availability-badge ${p.available === false ? 'unavailable' : 'available'}">${p.available === false ? 'وف' : 'متوفر'}</span>`;
         const $ = id => document.getElementById(id);
         const byId = id => products.find(p => p.id === id);
         const store = {
@@ -736,7 +736,7 @@ window.replaceStoreProducts = function(remoteProducts) {
                     ${images.map((src, i) => `<div class="carousel-slide"><img src="${src}" alt="${name} - صورة ${i + 1}" decoding="async" ${i ? 'loading="lazy"' : ''} onclick="${ctx === 'pdp' ? `openImageModal('${src}')` : `openPDP('${id}')`}"></div>`).join('')}
                 </div>
                 <div class="carousel-dots" id="dots-${sid}">${images.map((_, i) => `<span class="dot ${i ? '' : 'active'}"></span>`).join('')}</div>
-                <span class="availability-badge carousel-availability ${available === false ? 'unavailable' : 'available'}">${available === false ? 'غير متوفر' : 'متوفر'}</span>
+                <span class="availability-badge carousel-availability ${available === false ? 'unavailable' : 'available'}">${available === false ? ' نفدت الكمية' : 'متوفر'}</span>
                 <button class="wishlist-btn ${wished ? 'active' : ''}" data-wish="${id}" aria-label="المفضلة" aria-pressed="${wished}" onclick="toggleWishlist('${id}', event)"><i class="fa-${wished ? 'solid' : 'regular'} fa-heart"></i></button>
             </div>`;
         }
@@ -779,7 +779,7 @@ window.replaceStoreProducts = function(remoteProducts) {
                         </div>
                         <small style="display:block; color:var(--text-muted); font-size:.75rem;">اختاري المقاس المناسب قبل إضافة العباية إلى الحقيبة.</small>
                     </div>
-                    <button class="btn btn-accent ${p.available === false ? 'unavailable-button' : ''}" ${p.available === false ? 'disabled' : ''} onclick="addToCartCurrent()"><i class="fa-solid fa-bag-shopping"></i> ${p.available === false ? 'المنتج غير متوفر حالياً' : 'إضافة إلى الحقيبة'}</button>
+                    <button class="btn btn-accent ${p.available === false ? 'unavailable-button' : ''}" ${p.available === false ? 'disabled' : ''} onclick="addToCartCurrent()"><i class="fa-solid fa-bag-shopping"></i> ${p.available === false ? 'هذا المنتج  نفدت كميته حالياً' : 'إضافة إلى الحقيبة'}</button>
                 </div>
             </div>`;
             document.querySelectorAll('#pdpContent .size-option').forEach(button => {
@@ -838,7 +838,7 @@ if (p.sizeMode === 'standard') {
         /* السلة */
       function addToCartCurrent() {
     if (activeProduct && activeProduct.available === false) {
-        showToast('هذا المنتج غير متوفر حالياً');
+        showToast('هذا المنتج  نفدت كميته حالياً');
         return;
     }
     if (!selectedSize) {
