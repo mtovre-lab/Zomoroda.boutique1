@@ -37,8 +37,13 @@ button.danger{background:#b93232;color:white}
 <button id="logoutBtn">تسجيل الخروج</button>
 
 <div class="grid">
-<div class="card"><h2>المنتجات</h2><p id="productCount">0</p></div>
-<div class="card"><h2>الطلبات</h2><p id="orderCount">0</p></div>
+    <div class="card"><h2>المنتجات</h2><p id="productCount">0</p></div>
+    <div class="card"><h2>مجموع الطلبات</h2><p id="orderCount">0</p></div>
+    <div class="card"><h2>طلبات جديدة</h2><p id="newOrders">0</p></div>
+    <div class="card"><h2>قيد التجهيز</h2><p id="processingOrders">0</p></div>
+    <div class="card"><h2>تم التوصيل</h2><p id="deliveredOrders">0</p></div>
+    <div class="card"><h2>طلبات ملغية</h2><p id="cancelledOrders">0</p></div>
+    <div class="card"><h2>مداخيل الطلبات المسلّمة</h2><p id="totalRevenue">0 د.م</p></div>
 </div>
 
 <div class="card">
@@ -58,7 +63,6 @@ button.danger{background:#b93232;color:white}
     <option value="custom">Custom - مقاسات نحددها بنفسي</option>
     <option value="standard">Standard - مقاس موحد</option>
 </select>
-
 <label>المقاسات (كل مقاس في سطر)</label>
 <textarea id="productSizes" placeholder="S&#10;M&#10;L&#10;XL&#10;XXL"></textarea>
 <p class="muted">تقدر تزيد أو تحذف أو تبدل المقاسات وقت ما بغيتي. في وضع Standard لن يحتاج الزبون لاختيار مقاس.</p>
@@ -231,6 +235,7 @@ async function loadProducts() {
    <button data-edit="${item.id}">تعديل</button>
    <button class="danger" data-delete="${item.id}">حذف</button>
   `;
+
   $("productsList").appendChild(div);
 
   div.querySelector("[data-edit]").onclick = () => {
@@ -261,11 +266,28 @@ $("productSizes").value = (p.sizes || []).join("\n");
 
 async function loadOrders() {
  const snap = await getDocs(collection(db,"orders"));
+ let newCount = 0;
+let processingCount = 0;
+
+let deliveredCount = 0;
+let cancelledCount = 0;
+let revenue = 0;
  $("orderCount").textContent = snap.size;
  $("ordersList").innerHTML = "";
 
  snap.forEach(item => {
   const o = item.data();
+  const status = o.status || "جديد";
+
+if (status === "جديد") newCount++;
+if (status === "قيد التجهيز") processingCount++;
+
+if (status === "تم التوصيل") {
+    deliveredCount++;
+    revenue += Number(o.total) || 0;
+}
+
+if (status === "ملغي") cancelledCount++;
   const div = document.createElement("div");
   div.className = "item";
   div.innerHTML = `
@@ -274,8 +296,21 @@ async function loadOrders() {
    <p>الهاتف: ${escapeHTML(o.phone)}</p>
    <p>المدينة: ${escapeHTML(o.city)}</p>
    <p>العنوان: ${escapeHTML(o.address)}</p>
-   <p>المنتجات: ${escapeHTML(JSON.stringify(o.items || []))}</p>
-   <p>الحالة الحالية: ${escapeHTML(o.status || "جديد")}</p>
+   <p>المنتجات:</p>
+   <div class="order-products">
+    ${(Array.isArray(o.items) ? o.items : []).map(product => `
+     <div style="display:flex;gap:12px;align-items:center;margin:12px 0;padding:10px;background:#292929;border-radius:10px;">
+      ${product.imageUrl ? `<img src="${escapeHTML(product.imageUrl)}" alt="${escapeHTML(product.name)}" style="width:85px;height:105px;object-fit:cover;border-radius:8px;">` : '<span class="muted">لا توجد صورة محفوظة لهذا المنتج</span>'}
+      <div>
+       <strong>${escapeHTML(product.name)}</strong>
+       <p>المقاس: ${escapeHTML(product.size)}</p>
+       <p>الكمية: ${escapeHTML(product.quantity)}</p>
+       <p>السعر: ${escapeHTML(product.price)} د.م</p>
+      </div>
+     </div>
+    `).join('')}
+   </div>
+   <p>الحالة الحالية: ${escapeHTML(status)}</p>
    <select class="status">
     <option>جديد</option>
     <option>قيد التجهيز</option>
@@ -283,6 +318,7 @@ async function loadOrders() {
     <option>ملغي</option>
    </select>
    <button class="saveStatus">حفظ الحالة</button>
+   <button class="danger deleteOrder">حذف الطلب</button>
   `;
 
   const select = div.querySelector(".status");
@@ -294,13 +330,31 @@ async function loadOrders() {
      status:select.value
     });
     alert("تم تحديث حالة الطلب.");
+    await loadOrders();
    } catch(error) {
     alert(error.message);
    }
   };
+div.querySelector(".deleteOrder").onclick = async () => {
+    if (!confirm("واش متأكد من حذف هاد الطلب نهائياً؟")) return;
 
+    try {
+        await deleteDoc(doc(db, "orders", item.id));
+        await loadOrders();
+        alert("تم حذف الطلب.");
+    } catch (error) {
+    console.error("ORDER DELETE ERROR:", error);
+    alert("تعذر حذف الطلب: " + error.message);
+}
+};
   $("ordersList").appendChild(div);
  });
+
+ $("newOrders").textContent = newCount;
+ $("processingOrders").textContent = processingCount;
+ $("deliveredOrders").textContent = deliveredCount;
+ $("cancelledOrders").textContent = cancelledCount;
+ $("totalRevenue").textContent = revenue.toLocaleString("fr-MA") + " د.م";
 }
 </script>
 </body>

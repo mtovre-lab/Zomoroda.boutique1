@@ -103,6 +103,8 @@
 
         /* كروت المنتجات */
         .products-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        /* منع ظهور المنتجات الافتراضية قبل اكتمال تحميل Firebase */
+        .products-grid.is-loading { visibility: hidden; }
         .product-card {
             background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden;
             border: 1px solid var(--border); box-shadow: var(--shadow-soft); transition: var(--transition); position: relative;
@@ -399,7 +401,7 @@
                 <button class="tab-btn" onclick="filterCategory('best', this)">الأكثر مبيعاً 🔥</button>
             </div>
 
-            <div class="products-grid" id="productsGrid"></div>
+            <div class="products-grid is-loading" id="productsGrid"></div>
 
             <!-- قسم التواصل مدمج في أسفل الصفحة فقط -->
         </main>
@@ -542,6 +544,7 @@
         ];
 window.replaceStoreProducts = function(remoteProducts) {
     products = remoteProducts;
+    $("productsGrid").classList.remove("is-loading");
     applyFilters();
     renderWishlist();
     route();
@@ -560,11 +563,13 @@ window.replaceStoreProducts = function(remoteProducts) {
         // العناصر القديمة التي لا تحتوي على مقاس تبقى صالحة ولا تضيع من السلة.
        let cart = store.get('zomoroda_cart')
     .filter(i => i && byId(i.id))
-    .map(({ id, size, qty }) => ({
-        id,
-        size: size || 'غير محدد',
-        qty: Math.max(1, +qty || 1)
-    }));
+    .map(({ id, size, qty, imageUrl, imageIndex }) => ({
+    id,
+    size: size || 'غير محدد',
+    imageUrl: imageUrl || '',
+    imageIndex: Number.isInteger(imageIndex) ? imageIndex : 0,
+    qty: Math.max(1, +qty || 1)
+}));
         let wishlist = store.get('zomoroda_wishlist').filter(id => byId(id));
        let activeProduct = null, selectedSize = '', category = 'all', query = '', toastTimer;
 
@@ -635,6 +640,25 @@ window.replaceStoreProducts = function(remoteProducts) {
             const i = slideIndex($(`track-${sid}`));
             document.querySelectorAll(`#dots-${sid} .dot`).forEach((d, k) => d.classList.toggle('active', k === i));
         }
+        function getSelectedProductImage(product) {
+    const track = document.getElementById(`track-pdp-${product.id}`);
+    if (!track || !track.children.length) {
+        return {
+            imageUrl: product.images[0] || '',
+            imageIndex: 0
+        };
+    }
+
+    const imageIndex = Math.min(
+        Math.max(0, slideIndex(track)),
+        product.images.length - 1
+    );
+
+    return {
+        imageUrl: product.images[imageIndex] || product.images[0] || '',
+        imageIndex
+    };
+}
         function carousel(id, images, ctx, name) {
             const sid = `${ctx}-${id}`, wished = wishlist.includes(id);
             return `
@@ -743,19 +767,38 @@ if (p.sizeMode === 'standard') {
         }
 
         /* السلة */
-        function addToCartCurrent() {
-            if (!selectedSize) {
-                showToast('اختاري المقاس أولاً من فضلكِ');
-                $('sizeLabel').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
-            const ex = cart.find(i => i.id === activeProduct.id && i.size === selectedSize);
-if (ex) ex.qty++;
-else cart.push({ id: activeProduct.id, size: selectedSize, qty: 1 });
-            saveCart(); triggerCartIconAnimation();
-            showToast('تمت إضافة العباية إلى الحقيبة 🛍️');
-            showPage('cartPage');
-        }
+      function addToCartCurrent() {
+    if (!selectedSize) {
+        showToast('اختاري المقاس أولاً من فضلكِ');
+        $('sizeLabel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    const selectedImage = getSelectedProductImage(activeProduct);
+
+    const ex = cart.find(i =>
+        i.id === activeProduct.id &&
+        i.size === selectedSize &&
+        i.imageUrl === selectedImage.imageUrl
+    );
+
+    if (ex) {
+        ex.qty++;
+    } else {
+        cart.push({
+            id: activeProduct.id,
+            size: selectedSize,
+            imageUrl: selectedImage.imageUrl,
+            imageIndex: selectedImage.imageIndex,
+            qty: 1
+        });
+    }
+
+    saveCart();
+    triggerCartIconAnimation();
+    showToast('تمت إضافة العباية إلى الحقيبة 🛍️');
+    showPage('cartPage');
+}
         function updateCartQty(i, d) { cart[i].qty += d; if (cart[i].qty <= 0) cart.splice(i, 1); saveCart(); }
         function removeCartItem(i) { cart.splice(i, 1); saveCart(); }
         function saveCart() { store.set('zomoroda_cart', cart); updateBadges(); renderCart(); }
@@ -765,7 +808,7 @@ else cart.push({ id: activeProduct.id, size: selectedSize, qty: 1 });
                 const p = byId(it.id);
                 return `
                 <div class="cart-item">
-                    <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+                    <img src="${it.imageUrl || p.images[0]}" alt="${p.name}" loading="lazy">
                     <div style="flex:1;">
                         <div style="font-weight:700; font-size:0.85rem;">${p.name}</div>
                         <div style="font-size:0.75rem; color:var(--text-muted);">المقاس: ${it.size || 'غير محدد'}</div>
@@ -835,6 +878,7 @@ else cart.push({ id: activeProduct.id, size: selectedSize, qty: 1 });
                 itemsText += `  المقاس: ${item.size || 'غير محدد'}\n`;
                 itemsText += `  الكمية: ${item.qty}\n`;
                 itemsText += `  السعر: ${money(totalItemPrice)}\n\n`;
+                itemsText += `  رابط الصورة: ${item.imageUrl || item.images?.[0] || 'لا توجد صورة'}\n\n`;
             });
 
             const message = `مرحباً متجر ZOMORODA.BOUTIQUE، أريد طلب المنتجات التالية:\n\n${itemsText}المجموع النهائي: ${money(grandTotal)}\n\nالاسم: ${name}\nرقم الهاتف: ${phoneValue}\nالمدينة: ${city}\nالعنوان: ${address}\n\nشكراً لكم.`;
@@ -848,13 +892,15 @@ try {
     const orderItems = cart.map(it => {
         const p = byId(it.id);
 
-        return {
-            productId: it.id,
-            name: p.name,
-            price: p.price,
-            size: it.size || "غير محدد",
-            quantity: it.qty
-        };
+       return {
+    productId: it.id,
+    name: p.name,
+    price: p.price,
+    size: it.size || "غير محدد",
+    quantity: it.qty,
+    imageUrl: it.imageUrl || p.images[0] || "",
+    imageIndex: it.imageIndex || 0
+};
     });
 
     await window.saveCustomerOrder({
@@ -926,10 +972,15 @@ try {
 
         if (remoteProducts.length && window.replaceStoreProducts) {
             window.replaceStoreProducts(remoteProducts);
+        } else {
+            document.getElementById("productsGrid").classList.remove("is-loading");
         }
+    } else {
+        document.getElementById("productsGrid").classList.remove("is-loading");
     }
 } catch (error) {
     console.error("خطأ في تحميل المنتجات من Firebase:", error);
+    document.getElementById("productsGrid").classList.remove("is-loading");
 }
 </script>
 </body>
