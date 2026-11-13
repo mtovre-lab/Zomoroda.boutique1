@@ -158,6 +158,15 @@
         .card-info { padding: 16px; }
         .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; color: var(--primary); }
         .card-price { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+        .price-line { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .old-price { color:#888; font-size:.9rem; font-weight:600; text-decoration:line-through; }
+        .current-price { color:var(--accent-text); font-size:1.1rem; font-weight:800; }
+        .availability-badge { display:inline-flex; align-items:center; justify-content:center; padding:5px 12px; border-radius:999px; font-size:.78rem; font-weight:800; margin-top:8px; }
+        .carousel-availability { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); z-index:6; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.14); }
+        .carousel-dots { left:auto; right:12px; transform:none; }
+        .availability-badge.available { background:#fff4c7; color:#8a6d1a; }
+        .availability-badge.unavailable { background:#fce8e6; color:#b3261e; }
+        .unavailable-button { opacity:.55; cursor:not-allowed; }
 
         /* الأزرار والنماذج */
         .btn {
@@ -356,6 +365,57 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
         }
+
+
+        /* ===== عرض كامل للكمبيوتر + شبكة منتجات صغيرة للهاتف ===== */
+        html, body { width:100%; min-width:0; }
+        body { display:block; background:var(--bg); }
+        .app-container {
+            width:100%; max-width:none; height:100dvh; max-height:none;
+            margin:0; border-radius:0; box-shadow:none;
+        }
+        .page { width:100%; }
+        @media (min-width: 600px) {
+            .page { --page-pad: clamp(20px, 3vw, 44px); }
+            .products-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+            .carousel-container { aspect-ratio: 4 / 5; max-height: min(58vw, 560px); }
+            .card-info { padding:18px; }
+        }
+        @media (min-width: 1100px) {
+            .products-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:28px; }
+            .carousel-container { max-height:520px; }
+        }
+        @media (max-width: 599px) {
+            .page { --page-pad:10px; padding:10px; }
+            .products-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+            .product-card { min-width:0; border-radius:12px; }
+            .carousel-container { height:auto; aspect-ratio:3 / 4; max-height:none; }
+            .carousel-arrow { width:25px; height:25px; font-size:.65rem; }
+            .carousel-arrow.prev { right:4px; }
+            .carousel-arrow.next { left:4px; }
+            .wishlist-btn { width:25px; height:25px; top:5px; left:5px; font-size:.72rem; }
+            .carousel-dots { bottom:5px; right:5px; gap:3px; padding:3px 5px; }
+            .dot { width:4px; height:4px; }
+            .dot.active { width:10px; }
+            .carousel-availability { bottom:5px; left:5px; transform:none; font-size:.55rem; padding:3px 5px; margin:0; }
+            .card-info { padding:7px 6px 8px; }
+            .card-title { font-size:.72rem; line-height:1.35; min-height:2.7em; margin-bottom:4px; }
+            .price-line { gap:4px; }
+            .old-price { font-size:.62rem; }
+            .current-price, .card-price { font-size:.75rem; }
+            .availability-badge { font-size:.58rem; padding:3px 5px; margin-top:5px; }
+            .card-info .btn { padding:7px 3px; font-size:.62rem; gap:3px; border-radius:20px; }
+            .header-actions { gap:7px; }
+            header { padding:9px 10px; }
+            .logo { font-size:.9rem; }
+            .icon-btn { font-size:1rem; }
+        }
+        @media (max-width: 359px) {
+            .products-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+            .card-title { font-size:.82rem; }
+            .current-price, .card-price { font-size:.9rem; }
+        }
+
     </style>
 </head>
 <body>
@@ -491,6 +551,7 @@
                 id: "p1",
                 name: "عباية الحرير الأسود المطرزة يدوياً",
                 price: 850,
+                discountActive: false, originalPrice: null, available: true,
                 tag: "best",
                 colors: [
                     { name: "أسود ملكي", hex: "#111111" },
@@ -509,6 +570,7 @@
                 id: "p2",
                 name: "عباية المخمل الملكي بكريستال فاخر",
                 price: 1100,
+                discountActive: false, originalPrice: null, available: true,
                 tag: "new",
                 colors: [
                     { name: "أسود فاحم", hex: "#050505" },
@@ -527,6 +589,7 @@
                 id: "p3",
                 name: "عباية الكتان البيج بياقة مطوية",
                 price: 690,
+                discountActive: false, originalPrice: null, available: true,
                 tag: "new",
                 colors: [
                     { name: "بيج دافئ", hex: "#D7C4B7" },
@@ -551,6 +614,10 @@ window.replaceStoreProducts = function(remoteProducts) {
 };
         const CURRENCY = 'د.م'; // غيّريها إلى 'د.م' إن كانت الأسعار بالدرهم المغربي
         const money = n => `${n} ${CURRENCY}`;
+        const priceMarkup = p => p.discountActive && Number(p.originalPrice) > Number(p.price)
+            ? `<div class="price-line"><span class="old-price">${money(p.originalPrice)}</span><span class="current-price">${money(p.price)}</span></div>`
+            : `<div class="current-price">${money(p.price)}</div>`;
+        const availabilityMarkup = p => `<span class="availability-badge ${p.available === false ? 'unavailable' : 'available'}">${p.available === false ? 'غير متوفر' : 'متوفر'}</span>`;
         const $ = id => document.getElementById(id);
         const byId = id => products.find(p => p.id === id);
         const store = {
@@ -659,7 +726,7 @@ window.replaceStoreProducts = function(remoteProducts) {
         imageIndex
     };
 }
-        function carousel(id, images, ctx, name) {
+        function carousel(id, images, ctx, name, available = true) {
             const sid = `${ctx}-${id}`, wished = wishlist.includes(id);
             return `
             <div class="carousel-container">
@@ -669,16 +736,17 @@ window.replaceStoreProducts = function(remoteProducts) {
                     ${images.map((src, i) => `<div class="carousel-slide"><img src="${src}" alt="${name} - صورة ${i + 1}" decoding="async" ${i ? 'loading="lazy"' : ''} onclick="${ctx === 'pdp' ? `openImageModal('${src}')` : `openPDP('${id}')`}"></div>`).join('')}
                 </div>
                 <div class="carousel-dots" id="dots-${sid}">${images.map((_, i) => `<span class="dot ${i ? '' : 'active'}"></span>`).join('')}</div>
+                <span class="availability-badge carousel-availability ${available === false ? 'unavailable' : 'available'}">${available === false ? 'غير متوفر' : 'متوفر'}</span>
                 <button class="wishlist-btn ${wished ? 'active' : ''}" data-wish="${id}" aria-label="المفضلة" aria-pressed="${wished}" onclick="toggleWishlist('${id}', event)"><i class="fa-${wished ? 'solid' : 'regular'} fa-heart"></i></button>
             </div>`;
         }
         function productCard(p, ctx, i = 0) {
             return `
             <article class="product-card" style="--i:${i}">
-                ${carousel(p.id, p.images, ctx, p.name)}
+                ${carousel(p.id, p.images, ctx, p.name, p.available)}
                 <div class="card-info">
                     <h3 class="card-title">${p.name}</h3>
-                    <div class="card-price">${money(p.price)}</div>
+                    ${priceMarkup(p)}
                     <div style="margin-top:12px;"><button class="btn btn-primary" onclick="openPDP('${p.id}')">استعراض العباية والتفاصيل</button></div>
                 </div>
             </article>`;
@@ -692,10 +760,10 @@ window.replaceStoreProducts = function(remoteProducts) {
            activeProduct = p; selectedSize = '';
             $('pdpContent').innerHTML = `
             <div class="pdp-layout">
-                ${carousel(p.id, p.images, 'pdp', p.name)}
+                ${carousel(p.id, p.images, 'pdp', p.name, p.available)}
                 <div>
                     <h1 style="font-size:1.2rem; font-weight:800;">${p.name}</h1>
-                    <div style="font-size:1.25rem; font-weight:800; color:var(--accent-text); margin:6px 0;">${money(p.price)}</div>
+                    <div style="margin:6px 0;">${priceMarkup(p)}</div>
                     <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.7; margin-bottom:16px;">${p.desc}</p>
                  
                     <div style="margin-bottom:16px;">
@@ -711,7 +779,7 @@ window.replaceStoreProducts = function(remoteProducts) {
                         </div>
                         <small style="display:block; color:var(--text-muted); font-size:.75rem;">اختاري المقاس المناسب قبل إضافة العباية إلى الحقيبة.</small>
                     </div>
-                    <button class="btn btn-accent" onclick="addToCartCurrent()"><i class="fa-solid fa-bag-shopping"></i> إضافة إلى الحقيبة</button>
+                    <button class="btn btn-accent ${p.available === false ? 'unavailable-button' : ''}" ${p.available === false ? 'disabled' : ''} onclick="addToCartCurrent()"><i class="fa-solid fa-bag-shopping"></i> ${p.available === false ? 'المنتج غير متوفر حالياً' : 'إضافة إلى الحقيبة'}</button>
                 </div>
             </div>`;
             document.querySelectorAll('#pdpContent .size-option').forEach(button => {
@@ -758,7 +826,8 @@ if (p.sizeMode === 'standard') {
                     <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
                     <div style="flex:1;">
                         <div style="font-weight:700; font-size:0.85rem;">${p.name}</div>
-                        <div style="color:var(--accent-text); font-weight:800;">${money(p.price)}</div>
+                        ${priceMarkup(p)}
+                        ${availabilityMarkup(p)}
                     </div>
                     <button class="btn btn-primary" style="width:auto; padding:8px 14px; font-size:0.75rem;" onclick="openPDP('${p.id}')">عرض</button>
                     <button class="icon-btn" aria-label="إزالة من المفضلة" onclick="toggleWishlist('${p.id}')"><i class="fa-solid fa-trash"></i></button>
@@ -768,6 +837,10 @@ if (p.sizeMode === 'standard') {
 
         /* السلة */
       function addToCartCurrent() {
+    if (activeProduct && activeProduct.available === false) {
+        showToast('هذا المنتج غير متوفر حالياً');
+        return;
+    }
     if (!selectedSize) {
         showToast('اختاري المقاس أولاً من فضلكِ');
         $('sizeLabel').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -959,6 +1032,9 @@ try {
                 id: item.id,
                 name: p.name || "",
                 price: Number(p.price) || 0,
+                discountActive: p.discountActive === true,
+                originalPrice: p.originalPrice == null ? null : Number(p.originalPrice),
+                available: p.available !== false,
                 tag: p.tag || "new",
                 desc: p.desc || "",
                 images: p.images || [],

@@ -18,6 +18,12 @@ button.danger{background:#b93232;color:white}
 .item{border-bottom:1px solid #444;padding:14px 0}
 .muted{color:#aaa;font-size:13px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+
+/* تحسين لوحة التحكم على الهاتف والكمبيوتر دون تغيير الوظائف */
+.wrap { width:100%; max-width:1200px; }
+@media (min-width: 900px) { body { padding:28px; } .grid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
+@media (max-width: 600px) { body { padding:10px; } .card { padding:13px; } input,textarea,select { font-size:16px; } button { max-width:100%; } }
+
 </style>
 </head>
 <body>
@@ -50,7 +56,19 @@ button.danger{background:#b93232;color:white}
 <h2 id="formTitle">إضافة منتج جديد</h2>
 <form id="productForm">
 <input id="productName" required placeholder="اسم المنتج">
-<input id="productPrice" type="number" min="0" required placeholder="السعر">
+<label for="productPrice">الثمن بعد التخفيض / الثمن الحالي (د.م)</label>
+<input id="productPrice" type="number" min="0" required placeholder="الثمن الذي سيؤديه الزبون">
+<label style="display:flex;align-items:center;gap:9px;margin:4px 0 10px;">
+  <input id="discountActive" type="checkbox" style="width:auto;margin:0;">
+  تفعيل التخفيض لهذا المنتج
+</label>
+<label for="productOriginalPrice">الثمن الأصلي قبل التخفيض (د.م)</label>
+<input id="productOriginalPrice" type="number" min="0" placeholder="مثلاً 230">
+<label for="productAvailability">حالة المنتج</label>
+<select id="productAvailability">
+  <option value="true">متوفر</option>
+  <option value="false">غير متوفر</option>
+</select>
 <select id="productTag">
 <option value="new">جديد</option>
 <option value="best">الأكثر مبيعاً</option>
@@ -184,9 +202,21 @@ if (sizeMode === "custom" && !sizes.length) {
     return;
 }
 
+const discountActive = $("discountActive").checked;
+const currentPrice = Number($("productPrice").value);
+const originalPrice = Number($("productOriginalPrice").value);
+
+if (discountActive && (!originalPrice || originalPrice <= currentPrice)) {
+    $("productMsg").textContent = "عند تفعيل التخفيض، خاص الثمن الأصلي يكون أكبر من الثمن بعد التخفيض.";
+    return;
+}
+
 const data = {
     name: $("productName").value.trim(),
-    price: Number($("productPrice").value),
+    price: currentPrice,
+    discountActive,
+    originalPrice: discountActive ? originalPrice : null,
+    available: $("productAvailability").value === "true",
     tag: $("productTag").value,
     desc: $("productDesc").value.trim(),
     images,
@@ -231,7 +261,9 @@ async function loadProducts() {
   div.className = "item";
   div.innerHTML = `
    <strong>${escapeHTML(p.name)}</strong>
-   <p>${escapeHTML(p.price)} | ${escapeHTML(p.tag)}</p>
+   <p>${p.discountActive && Number(p.originalPrice) > Number(p.price)
+      ? `<del>${escapeHTML(p.originalPrice)} د.م</del> <strong>${escapeHTML(p.price)} د.م</strong>`
+      : `${escapeHTML(p.price)} د.م`} | ${p.available === false ? "غير متوفر" : "متوفر"} | ${escapeHTML(p.tag)}</p>
    <button data-edit="${item.id}">تعديل</button>
    <button class="danger" data-delete="${item.id}">حذف</button>
   `;
