@@ -1,0 +1,307 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZOMORODA - Admin</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101010;color:#eee;font-family:Arial,sans-serif;padding:20px}
+.wrap{max-width:1000px;margin:auto}
+h1,h2{color:#d4af37}
+.card{background:#1c1c1c;border:1px solid #393021;border-radius:14px;padding:18px;margin:16px 0}
+input,textarea,select{width:100%;padding:12px;margin:7px 0 14px;border:1px solid #555;border-radius:8px;background:#292929;color:white}
+button{padding:11px 17px;border:0;border-radius:8px;background:#d4af37;color:#111;font-weight:bold;cursor:pointer;margin:4px}
+button.danger{background:#b93232;color:white}
+.hidden{display:none}
+.item{border-bottom:1px solid #444;padding:14px 0}
+.muted{color:#aaa;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>ZOMORODA.BOUTIQUE</h1>
+<p class="muted">لوحة الإدارة والتحكم بالمتجر</p>
+
+<section id="login" class="card">
+<h2>تسجيل دخول المدير</h2>
+<input id="email" type="email" placeholder="البريد الإلكتروني">
+<input id="password" type="password" placeholder="كلمة المرور">
+<button id="loginBtn">دخول</button>
+<p id="loginMsg"></p>
+</section>
+
+<section id="dashboard" class="hidden">
+<button id="logoutBtn">تسجيل الخروج</button>
+
+<div class="grid">
+<div class="card"><h2>المنتجات</h2><p id="productCount">0</p></div>
+<div class="card"><h2>الطلبات</h2><p id="orderCount">0</p></div>
+</div>
+
+<div class="card">
+<h2 id="formTitle">إضافة منتج جديد</h2>
+<form id="productForm">
+<input id="productName" required placeholder="اسم المنتج">
+<input id="productPrice" type="number" min="0" required placeholder="السعر">
+<select id="productTag">
+<option value="new">جديد</option>
+<option value="best">الأكثر مبيعاً</option>
+</select>
+<textarea id="productDesc" placeholder="وصف المنتج"></textarea>
+<label>روابط الصور (كل رابط في سطر)</label>
+<textarea id="productImages" required placeholder="https://example.com/image.jpg"></textarea>
+<label>طريقة تحديد المقاس</label>
+<select id="productSizeMode">
+    <option value="custom">Custom - مقاسات نحددها بنفسي</option>
+    <option value="standard">Standard - مقاس موحد</option>
+</select>
+
+<label>المقاسات (كل مقاس في سطر)</label>
+<textarea id="productSizes" placeholder="S&#10;M&#10;L&#10;XL&#10;XXL"></textarea>
+<p class="muted">تقدر تزيد أو تحذف أو تبدل المقاسات وقت ما بغيتي. في وضع Standard لن يحتاج الزبون لاختيار مقاس.</p>
+<button type="submit">حفظ المنتج</button>
+<button type="button" id="cancelEdit" class="hidden">إلغاء التعديل</button>
+</form>
+<p id="productMsg"></p>
+</div>
+
+<div class="card">
+<h2>قائمة المنتجات</h2>
+<div id="productsList">جاري التحميل...</div>
+</div>
+
+<div class="card">
+<h2>طلبات الزبائن</h2>
+<div id="ordersList">جاري التحميل...</div>
+</div>
+</section>
+</div>
+
+<script type="module">
+import "./firebase.js";
+
+import {
+ signInWithEmailAndPassword,
+ signOut,
+ onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+
+import {
+collection, addDoc, getDocs, getDoc, doc, setDoc,
+deleteDoc, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+const auth = window.firebaseAuth;
+const db = window.firebaseDb;
+
+const $ = id => document.getElementById(id);
+let editingId = null;
+
+function escapeHTML(value) {
+ return String(value ?? "").replace(/[&<>"']/g, c => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+$("loginBtn").onclick = async () => {
+ $("loginMsg").textContent = "جاري تسجيل الدخول...";
+ try {
+  await signInWithEmailAndPassword(
+   auth, $("email").value.trim(), $("password").value
+  );
+  $("password").value = "";
+ } catch(error) {
+  $("loginMsg").textContent = "فشل الدخول: " + error.message;
+ }
+};
+
+$("logoutBtn").onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, async user => {
+ $("dashboard").classList.add("hidden");
+ $("login").classList.remove("hidden");
+
+ if (!user) return;
+
+ $("loginMsg").textContent = "جاري التحقق من صلاحيات المدير...";
+
+ try {
+  const adminRef = doc(db, "admins", user.uid);
+  const adminSnap = await getDoc(adminRef);
+
+  if (!adminSnap.exists() || adminSnap.data().role !== "admin") {
+   $("loginMsg").textContent = "هذا الحساب غير مصرح له بالدخول.";
+   await signOut(auth);
+   return;
+  }
+
+  $("login").classList.add("hidden");
+  $("dashboard").classList.remove("hidden");
+  $("loginMsg").textContent = "";
+
+  await loadProducts();
+  await loadOrders();
+
+ } catch(error) {
+  $("loginMsg").textContent = "تعذر التحقق من الصلاحيات: " + error.message;
+  await signOut(auth);
+ }
+});
+
+
+
+$("productForm").onsubmit = async e => {
+ e.preventDefault();
+ $("productMsg").textContent = "جاري الحفظ...";
+
+ const images = $("productImages").value
+  .split("\n").map(x => x.trim()).filter(Boolean);
+
+ 
+if(!images.length) {
+    $("productMsg").textContent = "تأكد من روابط الصور.";
+    return;
+}
+
+const sizeMode = $("productSizeMode").value;
+
+const sizes = sizeMode === "standard"
+    ? ["Standard"]
+    : $("productSizes").value
+        .split("\n")
+        .map(s => s.trim())
+        .filter(Boolean);
+
+if (sizeMode === "custom" && !sizes.length) {
+    $("productMsg").textContent = "أدخل مقاساً واحداً على الأقل.";
+    return;
+}
+
+const data = {
+    name: $("productName").value.trim(),
+    price: Number($("productPrice").value),
+    tag: $("productTag").value,
+    desc: $("productDesc").value.trim(),
+    images,
+    sizeMode,
+    sizes,
+    updatedAt: serverTimestamp()
+};
+
+ try {
+  if(editingId) {
+   await setDoc(doc(db,"products",editingId),data,{merge:true});
+  } else {
+   data.createdAt = serverTimestamp();
+   await addDoc(collection(db,"products"),data);
+  }
+
+  $("productMsg").textContent = "تم حفظ المنتج بنجاح.";
+  resetForm();
+  await loadProducts();
+ } catch(error) {
+  $("productMsg").textContent = "خطأ: " + error.message;
+ }
+};
+
+function resetForm() {
+ editingId = null;
+ $("productForm").reset();
+ $("formTitle").textContent = "إضافة منتج جديد";
+ $("cancelEdit").classList.add("hidden");
+}
+
+$("cancelEdit").onclick = resetForm;
+
+async function loadProducts() {
+ const snap = await getDocs(collection(db,"products"));
+ $("productCount").textContent = snap.size;
+ $("productsList").innerHTML = "";
+
+ snap.forEach(item => {
+  const p = item.data();
+  const div = document.createElement("div");
+  div.className = "item";
+  div.innerHTML = `
+   <strong>${escapeHTML(p.name)}</strong>
+   <p>${escapeHTML(p.price)} | ${escapeHTML(p.tag)}</p>
+   <button data-edit="${item.id}">تعديل</button>
+   <button class="danger" data-delete="${item.id}">حذف</button>
+  `;
+  $("productsList").appendChild(div);
+
+  div.querySelector("[data-edit]").onclick = () => {
+   editingId = item.id;
+   $("productName").value = p.name || "";
+   $("productPrice").value = p.price || 0;
+   $("productTag").value = p.tag || "new";
+   $("productDesc").value = p.desc || "";
+   $("productImages").value = (p.images || []).join("\n");
+ $("productSizeMode").value = p.sizeMode || "custom";
+$("productSizes").value = (p.sizes || []).join("\n");
+   $("formTitle").textContent = "تعديل المنتج";
+   $("cancelEdit").classList.remove("hidden");
+   window.scrollTo({top:0,behavior:"smooth"});
+  };
+
+  div.querySelector("[data-delete]").onclick = async () => {
+   if(!confirm("واش متأكد من حذف المنتج؟")) return;
+   try {
+    await deleteDoc(doc(db,"products",item.id));
+    await loadProducts();
+   } catch(error) {
+    alert(error.message);
+   }
+  };
+ });
+}
+
+async function loadOrders() {
+ const snap = await getDocs(collection(db,"orders"));
+ $("orderCount").textContent = snap.size;
+ $("ordersList").innerHTML = "";
+
+ snap.forEach(item => {
+  const o = item.data();
+  const div = document.createElement("div");
+  div.className = "item";
+  div.innerHTML = `
+   <strong>طلب رقم: ${escapeHTML(item.id)}</strong>
+   <p>الاسم: ${escapeHTML(o.name)}</p>
+   <p>الهاتف: ${escapeHTML(o.phone)}</p>
+   <p>المدينة: ${escapeHTML(o.city)}</p>
+   <p>العنوان: ${escapeHTML(o.address)}</p>
+   <p>المنتجات: ${escapeHTML(JSON.stringify(o.items || []))}</p>
+   <p>الحالة الحالية: ${escapeHTML(o.status || "جديد")}</p>
+   <select class="status">
+    <option>جديد</option>
+    <option>قيد التجهيز</option>
+    <option>تم التوصيل</option>
+    <option>ملغي</option>
+   </select>
+   <button class="saveStatus">حفظ الحالة</button>
+  `;
+
+  const select = div.querySelector(".status");
+  select.value = o.status || "جديد";
+
+  div.querySelector(".saveStatus").onclick = async () => {
+   try {
+    await updateDoc(doc(db,"orders",item.id),{
+     status:select.value
+    });
+    alert("تم تحديث حالة الطلب.");
+   } catch(error) {
+    alert(error.message);
+   }
+  };
+
+  $("ordersList").appendChild(div);
+ });
+}
+</script>
+</body>
+</html>

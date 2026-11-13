@@ -2,11 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZOMORODA.BOUTIQUE - عبايات فاخرة</title>
     <meta name="description" content="تسوقي أحدث صيحات العبايات الفاخرة والمطرزة يدويًا من ZOMORODA.BOUTIQUE.">
     <meta name="theme-color" content="#111111">
     
+    <meta property="og:title" content="ZOMORODA.BOUTIQUE - عبايات فاخرة"><meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111'/%3E%3Ctext x='16' y='23' font-size='20' text-anchor='middle' fill='%23D4AF37' font-family='serif'%3EZ%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -26,8 +29,8 @@
             --radius-full: 999px;
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
             --shadow-float: 0 15px 35px rgba(0,0,0,0.12);
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --transition: color .25s, background-color .25s, border-color .25s, box-shadow .25s, opacity .25s, transform .3s cubic-bezier(.25,.8,.25,1);
+            --transition-bounce: transform .4s cubic-bezier(.34,1.56,.64,1), background-color .25s, box-shadow .25s, opacity .25s;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -51,7 +54,9 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; }
         .logo { 
             font-size: 1.1rem; font-weight: 800; letter-spacing: 0.5px; 
-            background: linear-gradient(45deg, #111, var(--accent)); -webkit-background-clip: text; 
+            background: linear-gradient(45deg, #111, var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; cursor: pointer; transition: var(--transition); 
         }
         .logo:active { transform: scale(0.95); opacity: 0.8; }
@@ -101,14 +106,11 @@
         .product-card {
             background: var(--card-bg); border-radius: var(--radius-lg); overflow: hidden;
             border: 1px solid var(--border); box-shadow: var(--shadow-soft); transition: var(--transition); position: relative;
-            opacity: 0; transform: translateY(25px);
+            
         }
-        .product-card.reveal {
-            opacity: 1; transform: translateY(0); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .product-card:hover, .product-card:active {
+        @media (hover:hover) { .product-card:hover {
             transform: translateY(-4px); box-shadow: 0 15px 35px rgba(212,175,55,0.12); border-color: rgba(212,175,55,0.4);
-        }
+        } }
 
         /* سلايدر الصور */
         .carousel-container {
@@ -136,7 +138,7 @@
         .carousel-dots {
             position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
             display: flex; gap: 6px; z-index: 5; background: rgba(0, 0, 0, 0.35); padding: 4px 10px;
-            border-radius: var(--radius-full); backdrop-filter: blur(4px);
+            border-radius: var(--radius-full); backdrop-filter: blur(6px);
         }
         .dot {
             width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.5); transition: var(--transition-bounce);
@@ -179,6 +181,12 @@
         .color-circle.active::after {
             content: '✓'; color: #fff; font-size: 0.75rem; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
+
+        /* اختيار المقاس في صفحة تفاصيل العباية */
+        .sizes-group { display: flex; flex-wrap: wrap; gap: 9px; margin: 12px 0 20px; }
+        .size-option { min-width: 46px; height: 42px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; background: #fff; color: var(--primary); font-size: .85rem; font-weight: 700; cursor: pointer; transition: var(--transition-bounce); }
+        .size-option:active { transform: scale(.94); }
+        .size-option.active { border-color: var(--accent-text); background: var(--primary); color: #fff; box-shadow: 0 3px 10px rgba(0,0,0,.12); }
 
         .cart-item { 
             display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border-radius: var(--radius-md); 
@@ -275,8 +283,8 @@
 
         /* Keyframes */
         @keyframes pageEnter {
-            from { opacity: 0; transform: scale(0.98) translateY(12px); filter: blur(4px); }
-            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+            from { opacity: 0; transform: scale(0.98) translateY(12px);  }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
@@ -308,15 +316,53 @@
             25% { transform: translateX(-6px); }
             75% { transform: translateX(6px); }
         }
+
+        /* ===== v2: وصولية وتجاوب وأداء ===== */
+        :root { --accent-text: #8A6D1A; --wa: #0E7C3A; }
+        body { min-height: 100dvh; }
+        .app-container { height: 100dvh; }
+        :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+        .card-price { color: var(--accent-text); }
+        .btn-accent, .badge { color: #111; }
+        .btn-whatsapp { background: var(--wa); box-shadow: none; }
+        .btn-link-instagram { color: #FF7AA8; }
+        .logo { display: block; text-decoration: none; background-clip: text; }
+        .icon-btn { min-width: 40px; min-height: 40px; }
+        .close-modal { background: none; border: none; }
+        .page { --page-pad: 16px; padding: var(--page-pad); }
+        .global-contact-section { margin: 32px calc(-1 * var(--page-pad)) calc(-1 * var(--page-pad)); }
+        .product-card { animation: cardIn .5s cubic-bezier(.16,1,.3,1) backwards; animation-delay: calc(var(--i, 0) * 70ms); }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(16px); } }
+        .carousel-container { height: auto; aspect-ratio: 4 / 5; max-height: 75vh; }
+        .pdp-layout .carousel-container { border-radius: var(--radius-lg); }
+        .carousel-track { overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; transition: none; }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        .carousel-slide { scroll-snap-align: start; }
+        .carousel-arrow, .wishlist-btn { width: 40px; height: 40px; }
+        .dot { display: block; }
+        .color-circle.active { transform: none; border-color: #fff; box-shadow: 0 0 0 2px var(--accent-text); }
+        .color-circle.active::after { content: none; }
+        .cart-controls button { width: 36px; height: 36px; }
+        .pdp-layout { display: grid; gap: 20px; }
+        @media (min-width: 600px) {
+            .app-container { max-width: min(1100px, 100%); max-height: none; }
+            .page { --page-pad: 28px; }
+            .products-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 768px) { .pdp-layout { grid-template-columns: 1fr 1fr; align-items: start; } }
+        @media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="toast" id="toastNotification"><i class="fa-solid fa-circle-check" style="color:var(--accent);"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
+    <div class="toast" id="toastNotification" role="status" aria-live="polite"><i class="fa-solid fa-circle-check" style="color:var(--accent);"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
 
     <!-- مودال التكبير -->
     <div class="image-modal" id="imageModal">
-        <span class="close-modal" onclick="closeImageModal()">&times;</span>
+        <button class="close-modal" aria-label="إغلاق" onclick="closeImageModal()">&times;</button>
         <img id="modalImg" src="" alt="تكبير صورة العباية">
     </div>
 
@@ -324,14 +370,14 @@
         <!-- الهيدر -->
         <header>
             <div class="header-top">
-                <div class="logo" onclick="showPage('homePage')">ZOMORODA.BOUTIQUE</div>
+                <a class="logo" href="#home">ZOMORODA.BOUTIQUE</a>
                 <div class="header-actions">
-                    <button class="icon-btn" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
-                    <button class="icon-btn" onclick="showPage('wishlistPage')">
+                    <button class="icon-btn" id="searchBtn" aria-label="بحث" aria-expanded="false" onclick="toggleSearch()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <button class="icon-btn" aria-label="المفضلة" onclick="showPage('wishlistPage')">
                         <i class="fa-solid fa-heart"></i>
                         <span class="badge" id="wishlistBadge">0</span>
                     </button>
-                    <button class="icon-btn" id="cartHeaderBtn" onclick="showPage('cartPage')">
+                    <button class="icon-btn" id="cartHeaderBtn" aria-label="حقيبة التسوق" onclick="showPage('cartPage')">
                         <i class="fa-solid fa-bag-shopping"></i>
                         <span class="badge" id="cartBadge">0</span>
                     </button>
@@ -340,7 +386,7 @@
             
             <div class="search-section" id="searchSection">
                 <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" placeholder="ابحثي باسم العباية أو القماش..." oninput="handleSearch(this.value)">
+                    <input type="search" aria-label="بحث" class="search-input" id="searchInput" placeholder="ابحثي باسم العباية أو القماش..." oninput="handleSearch(this.value)">
                 </div>
             </div>
         </header>
@@ -356,20 +402,6 @@
             <div class="products-grid" id="productsGrid"></div>
 
             <!-- قسم التواصل مدمج في أسفل الصفحة فقط -->
-            <footer class="global-contact-section">
-                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
-                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
-                <div class="contact-links">
-                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <span>تواصل عبر واتساب: +212777647921</span>
-                    </a>
-                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
-                        <i class="fa-brands fa-instagram"></i>
-                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
-                    </a>
-                </div>
-            </footer>
         </main>
 
         <!-- 2. صفحة تفاصيل المنتج PDP -->
@@ -383,42 +415,12 @@
                 <h3 style="font-size: 1rem; font-weight: 800; margin-bottom: 14px;">منتجات مشابهة قد تعجبكِ</h3>
                 <div class="products-grid" id="relatedProductsGrid"></div>
             </div>
-
-            <footer class="global-contact-section">
-                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
-                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
-                <div class="contact-links">
-                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <span>تواصل عبر واتساب: +212777647921</span>
-                    </a>
-                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
-                        <i class="fa-brands fa-instagram"></i>
-                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
-                    </a>
-                </div>
-            </footer>
         </div>
 
         <!-- 3. المفضلة -->
         <div class="page" id="wishlistPage">
             <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;">المفضلة ❤️</h2>
             <div id="wishlistList"></div>
-
-            <footer class="global-contact-section">
-                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
-                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
-                <div class="contact-links">
-                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <span>تواصل عبر واتساب: +212777647921</span>
-                    </a>
-                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
-                        <i class="fa-brands fa-instagram"></i>
-                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
-                    </a>
-                </div>
-            </footer>
         </div>
 
         <!-- 4. سلة التسوق -->
@@ -429,25 +431,10 @@
             <div id="cartSummary" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px;">
                 <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 1.15rem; margin-bottom: 16px;">
                     <span>المجموع النهائي:</span>
-                    <span id="cartTotal" style="color:var(--accent);">0 ر.س</span>
+                    <span id="cartTotal" style="color:var(--accent-text);">0 ر.س</span>
                 </div>
                 <button class="btn btn-primary" onclick="showPage('checkoutPage')">المتابعة لإتمام الطلب</button>
             </div>
-
-            <footer class="global-contact-section">
-                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
-                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
-                <div class="contact-links">
-                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <span>تواصل عبر واتساب: +212777647921</span>
-                    </a>
-                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
-                        <i class="fa-brands fa-instagram"></i>
-                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
-                    </a>
-                </div>
-            </footer>
         </div>
 
         <!-- 5. إتمام الطلب -->
@@ -455,50 +442,49 @@
             <h2 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 16px;">بيانات التوصيل 🚚</h2>
             <form onsubmit="processWhatsAppOrder(event)">
                 <div class="form-group">
-                    <label>الاسم الكامل *</label>
-                    <input type="text" id="custName" required placeholder="أدخلي اسمكِ الكريم">
+                    <label for="custName">الاسم الكامل *</label>
+                    <input type="text" id="custName" autocomplete="name" required placeholder="أدخلي اسمكِ الكريم">
                 </div>
                 <div class="form-group">
-                    <label>رقم الهاتف *</label>
-                    <input type="tel" id="custPhone" required placeholder="06xxxxxxxx أو 07xxxxxxxx أو 05xxxxxxxx" maxlength="10" oninput="formatPhoneInput(this)">
-                    <div class="error-msg" id="phoneError">عفواً، يجب أن يتكون الرقم من 10 أرقام ويبدأ بـ (05 أو 06 أو 07) حصراً.</div>
+                    <label for="custPhone">رقم الهاتف *</label>
+                    <input type="tel" id="custPhone" autocomplete="tel" required placeholder="06xxxxxxxx أو 07xxxxxxxx أو 05xxxxxxxx" maxlength="10" oninput="formatPhoneInput(this)">
+                    <div class="error-msg" id="phoneError" role="alert">عفواً، يجب أن يتكون الرقم من 10 أرقام ويبدأ بـ (05 أو 06 أو 07) حصراً.</div>
                 </div>
                 <div class="form-group">
-                    <label>المدينة *</label>
-                    <input type="text" id="custCity" required placeholder="اسم المدينة">
+                    <label for="custCity">المدينة *</label>
+                    <input type="text" id="custCity" autocomplete="address-level2" required placeholder="اسم المدينة">
                 </div>
                 <div class="form-group">
-                    <label>العنوان الكامل *</label>
-                    <input type="text" id="custAddress" required placeholder="اسم الحي، الشارع، رقم المنزل">
+                    <label for="custAddress">العنوان الكامل *</label>
+                    <input type="text" id="custAddress" autocomplete="street-address" required placeholder="اسم الحي، الشارع، رقم المنزل">
                 </div>
 
                 <button type="submit" class="btn btn-whatsapp" style="margin-top: 16px; padding: 14px;">
                     <i class="fa-brands fa-whatsapp"></i> إرسال الطلب عبر WhatsApp
                 </button>
             </form>
-
-            <footer class="global-contact-section">
-                <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
-                <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
-                <div class="contact-links">
-                    <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
-                        <i class="fa-brands fa-whatsapp"></i>
-                        <span>تواصل عبر واتساب: +212777647921</span>
-                    </a>
-                    <a href="https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
-                        <i class="fa-brands fa-instagram"></i>
-                        <span>تابعونا على إنستغرام: @zomoroda.boutique</span>
-                    </a>
-                </div>
-            </footer>
         </div>
     </div>
 
-    <script>
-        const WHATSAPP_NUMBER = "212777647921"; 
-        const INSTAGRAM_URL = "https://www.instagram.com/zomoroda.boutique?igsh=MXU1MHFpNGZzcTJjaA%3D%3D&utm_source=qr"; 
+    <template id="footerTpl">
+        <footer class="global-contact-section">
+            <div class="contact-brand">ZOMORODA.BOUTIQUE</div>
+            <p class="contact-subtext">تواصلوا معنا عبر حساباتنا الرسمية للاستفسار والطلبات</p>
+            <div class="contact-links">
+                <a href="https://wa.me/212777647921" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i><span>تواصل عبر واتساب: <bdi dir="ltr">+212777647921</bdi></span>
+                </a>
+                <a href="https://www.instagram.com/zomoroda.boutique" target="_blank" rel="noopener noreferrer" class="contact-btn-link btn-link-instagram">
+                    <i class="fa-brands fa-instagram"></i><span>تابعونا على إنستغرام: <bdi dir="ltr">@zomoroda.boutique</bdi></span>
+                </a>
+            </div>
+        </footer>
+    </template>
 
-        const products = [
+    <script>
+        const WHATSAPP_NUMBER = "212777647921";  
+
+  let products = [
             {
                 id: "p1",
                 name: "عباية الحرير الأسود المطرزة يدوياً",
@@ -554,341 +540,253 @@
                 desc: "تصميم عصري كلاسيكي باللون البيج الدافئ، مصنوعة من الكتان الطبيعي الفاخر المناسب لجميع الأوقات."
             }
         ];
+window.replaceStoreProducts = function(remoteProducts) {
+    products = remoteProducts;
+    applyFilters();
+    renderWishlist();
+    route();
+};
+        const CURRENCY = 'د.م'; // غيّريها إلى 'د.م' إن كانت الأسعار بالدرهم المغربي
+        const money = n => `${n} ${CURRENCY}`;
+        const $ = id => document.getElementById(id);
+        const byId = id => products.find(p => p.id === id);
+        const store = {
+            get(k) { try { const v = JSON.parse(localStorage.getItem(k)); return Array.isArray(v) ? v : []; } catch { return []; } },
+            set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+        };
+        const norm = t => t.toLowerCase().replace(/[\u064B-\u0652\u0640]/g, '').replace(/[أإآ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي');
 
-        let cart = JSON.parse(localStorage.getItem('zomoroda_cart')) || [];
-        let wishlist = JSON.parse(localStorage.getItem('zomoroda_wishlist')) || [];
-        let activeProduct = null;
-        let selectedColor = '';
-        let carouselStates = {};
+        // السلة تحفظ المعرّف واللون والمقاس والكمية؛ الاسم والسعر يؤخذان دائماً من قائمة المنتجات
+        // العناصر القديمة التي لا تحتوي على مقاس تبقى صالحة ولا تضيع من السلة.
+       let cart = store.get('zomoroda_cart')
+    .filter(i => i && byId(i.id))
+    .map(({ id, size, qty }) => ({
+        id,
+        size: size || 'غير محدد',
+        qty: Math.max(1, +qty || 1)
+    }));
+        let wishlist = store.get('zomoroda_wishlist').filter(id => byId(id));
+       let activeProduct = null, selectedSize = '', category = 'all', query = '', toastTimer;
+
+        /* التنقل عبر الهاش: زر الرجوع في الهاتف يعمل والروابط قابلة للمشاركة */
+        const ROUTES = { home: 'homePage', wishlist: 'wishlistPage', cart: 'cartPage', checkout: 'checkoutPage' };
+        function showPage(pageId) {
+            const name = pageId === 'pdpPage' ? `product/${activeProduct.id}` : Object.keys(ROUTES).find(k => ROUTES[k] === pageId);
+            if (location.hash.slice(1) === name) route(); else location.hash = name;
+        }
+        function route() {
+            const [name, arg] = (location.hash.slice(1) || 'home').split('/');
+            let pageId = ROUTES[name] || 'homePage';
+            if (name === 'product') pageId = renderPDP(arg) ? 'pdpPage' : 'homePage';
+            if (pageId === 'checkoutPage' && !cart.length) pageId = 'cartPage';
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === pageId));
+            $(pageId).scrollTop = 0;
+        }
+        window.addEventListener('hashchange', route);
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderProducts(products);
-            updateBadges();
-            renderCart();
-            renderWishlist();
-            initScrollReveal();
+            document.querySelectorAll('.page').forEach(p => p.appendChild($('footerTpl').content.cloneNode(true)));
+            applyFilters(); updateBadges(); renderCart(); renderWishlist(); route();
+            document.addEventListener('keydown', e => e.key === 'Escape' && closeImageModal());
+            $('imageModal').addEventListener('click', e => e.target.id === 'imageModal' && closeImageModal());
         });
 
-        function showPage(pageId) {
-            const pages = document.querySelectorAll('.page');
-            pages.forEach(p => p.classList.remove('active'));
-            
-            const targetPage = document.getElementById(pageId);
-            targetPage.classList.add('active');
-            targetPage.scrollTop = 0;
-
-            setTimeout(triggerScrollReveal, 100);
+        function showToast(msg) {
+            const t = $('toastNotification');
+            $('toastMsg').innerText = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+        }
+        function triggerCartIconAnimation() {
+            const b = $('cartHeaderBtn');
+            b.classList.remove('cart-shake'); void b.offsetWidth; b.classList.add('cart-shake');
         }
 
-        function showToast(message) {
-            const toast = document.getElementById('toastNotification');
-            document.getElementById('toastMsg').innerText = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2500);
+        /* البحث والفلترة معاً (البحث لم يعد يلغي التصنيف المختار) */
+        function applyFilters() {
+            const q = norm(query.trim());
+            const list = products.filter(p => (category === 'all' || p.tag === category) && (!q || norm(p.name + ' ' + p.desc).includes(q)));
+            $('productsGrid').innerHTML = list.length
+                ? list.map((p, i) => productCard(p, 'grid', i)).join('')
+                : `<p style="text-align:center; grid-column:1/-1; padding:30px; color:var(--text-muted);">لا توجد نتائج مطابقة لبحثكِ.</p>`;
         }
-
+        function handleSearch(v) { query = v; applyFilters(); }
+        function filterCategory(c, btn) {
+            category = c;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+            applyFilters();
+        }
         function toggleSearch() {
-            const sec = document.getElementById('searchSection');
-            sec.classList.toggle('active');
-            if (sec.classList.contains('active')) document.getElementById('searchInput').focus();
+            const on = $('searchSection').classList.toggle('active');
+            $('searchBtn').setAttribute('aria-expanded', on);
+            if (on) $('searchInput').focus(); else { $('searchInput').value = ''; handleSearch(''); }
         }
 
-        function handleSearch(q) {
-            const filtered = products.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.desc.includes(q));
-            renderProducts(filtered);
+        /* السلايدر: تمرير أصلي باللمس + أسهم + نقاط، ومعرّفات فريدة لكل موضع */
+        const slideIndex = t => Math.round(Math.abs(t.scrollLeft) / t.clientWidth);
+        function moveSlide(sid, step, e) {
+            if (e) e.stopPropagation();
+            const t = $(`track-${sid}`), n = t.children.length;
+            const next = (slideIndex(t) + step + n) % n;
+            t.scrollTo({ left: next * t.clientWidth * (getComputedStyle(t).direction === 'rtl' ? -1 : 1), behavior: 'smooth' });
         }
-
-        function filterCategory(category, btn) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            if (category === 'all') renderProducts(products);
-            else renderProducts(products.filter(p => p.tag === category));
+        function syncDots(sid) {
+            const i = slideIndex($(`track-${sid}`));
+            document.querySelectorAll(`#dots-${sid} .dot`).forEach((d, k) => d.classList.toggle('active', k === i));
         }
-
-        function moveSlide(sliderId, direction, event) {
-            if(event) event.stopPropagation();
-
-            if (carouselStates[sliderId] === undefined) carouselStates[sliderId] = 0;
-
-            const totalSlides = 4;
-            let currentIndex = carouselStates[sliderId];
-
-            if (direction === 'next') {
-                currentIndex = (currentIndex + 1) % totalSlides;
-            } else {
-                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-            }
-
-            carouselStates[sliderId] = currentIndex;
-            updateCarouselUI(sliderId, currentIndex);
-        }
-
-        function updateCarouselUI(sliderId, index) {
-            const track = document.getElementById(`track-${sliderId}`);
-            if (track) {
-                track.style.transform = `translateX(${index * 100}%)`;
-            }
-
-            const dots = document.querySelectorAll(`#dots-${sliderId} .dot`);
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === index);
-            });
-        }
-
-        function generateCarouselHTML(id, images, isPDP = false) {
-            const sliderId = isPDP ? `pdp-${id}` : `grid-${id}`;
-            const currentIdx = carouselStates[sliderId] || 0;
-
+        function carousel(id, images, ctx, name) {
+            const sid = `${ctx}-${id}`, wished = wishlist.includes(id);
             return `
-                <div class="carousel-container" style="${isPDP ? 'height: 420px; border-radius: var(--radius-lg);' : ''}">
-                    <button class="carousel-arrow prev" onclick="moveSlide('${sliderId}', 'prev', event)"><i class="fa-solid fa-chevron-right"></i></button>
-                    <button class="carousel-arrow next" onclick="moveSlide('${sliderId}', 'next', event)"><i class="fa-solid fa-chevron-left"></i></button>
-
-                    <div class="carousel-track" id="track-${sliderId}" style="transform: translateX(${currentIdx * 100}%);">
-                        ${images.map(img => `
-                            <div class="carousel-slide">
-                                <img src="${img}" alt="صورة العباية" ${isPDP ? `onclick="openImageModal('${img}')"` : `onclick="openPDP('${id}')"`}>
-                            </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="carousel-dots" id="dots-${sliderId}">
-                        ${images.map((_, i) => `<div class="dot ${i === currentIdx ? 'active' : ''}"></div>`).join('')}
-                    </div>
+            <div class="carousel-container">
+                <button class="carousel-arrow prev" aria-label="الصورة السابقة" onclick="moveSlide('${sid}', -1, event)"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="carousel-arrow next" aria-label="الصورة التالية" onclick="moveSlide('${sid}', 1, event)"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="carousel-track" id="track-${sid}" onscroll="syncDots('${sid}')">
+                    ${images.map((src, i) => `<div class="carousel-slide"><img src="${src}" alt="${name} - صورة ${i + 1}" decoding="async" ${i ? 'loading="lazy"' : ''} onclick="${ctx === 'pdp' ? `openImageModal('${src}')` : `openPDP('${id}')`}"></div>`).join('')}
                 </div>
-            `;
+                <div class="carousel-dots" id="dots-${sid}">${images.map((_, i) => `<span class="dot ${i ? '' : 'active'}"></span>`).join('')}</div>
+                <button class="wishlist-btn ${wished ? 'active' : ''}" data-wish="${id}" aria-label="المفضلة" aria-pressed="${wished}" onclick="toggleWishlist('${id}', event)"><i class="fa-${wished ? 'solid' : 'regular'} fa-heart"></i></button>
+            </div>`;
+        }
+        function productCard(p, ctx, i = 0) {
+            return `
+            <article class="product-card" style="--i:${i}">
+                ${carousel(p.id, p.images, ctx, p.name)}
+                <div class="card-info">
+                    <h3 class="card-title">${p.name}</h3>
+                    <div class="card-price">${money(p.price)}</div>
+                    <div style="margin-top:12px;"><button class="btn btn-primary" onclick="openPDP('${p.id}')">استعراض العباية والتفاصيل</button></div>
+                </div>
+            </article>`;
         }
 
-        let revealObserver;
-        function initScrollReveal() {
-            revealObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('reveal');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            triggerScrollReveal();
-        }
-
-        function triggerScrollReveal() {
-            const cards = document.querySelectorAll('.product-card');
-            cards.forEach(card => {
-                if (revealObserver) revealObserver.observe(card);
-                else card.classList.add('reveal');
-            });
-        }
-
-        function renderProducts(list) {
-            const grid = document.getElementById('productsGrid');
-            if(list.length === 0) {
-                grid.innerHTML = `<p style="text-align:center; grid-column: 1/-1; padding:30px; color:var(--text-muted);">لا توجد نتائج مطابقة لبحثكِ.</p>`;
-                return;
-            }
-            grid.innerHTML = list.map(p => {
-                const isWish = wishlist.includes(p.id);
-                return `
-                    <div class="product-card">
-                        ${generateCarouselHTML(p.id, p.images, false)}
-                        
-                        <button class="wishlist-btn ${isWish ? 'active' : ''}" onclick="toggleWishlist('${p.id}', event)">
-                            <i class="fa-${isWish ? 'solid' : 'regular'} fa-heart"></i>
-                        </button>
-                        
-                        <div class="card-info">
-                            <div class="card-title">${p.name}</div>
-                            <div class="card-price">${p.price} ر.س</div>
-                            <div style="margin-top: 12px;">
-                                <button class="btn btn-primary" onclick="openPDP('${p.id}')">استعراض العباية والتفاصيل</button>
-                            </div>
+        /* صفحة المنتج */
+        function openPDP(id) { location.hash = `product/${id}`; }
+        function renderPDP(id) {
+            const p = byId(id);
+            if (!p) return false;
+           activeProduct = p; selectedSize = '';
+            $('pdpContent').innerHTML = `
+            <div class="pdp-layout">
+                ${carousel(p.id, p.images, 'pdp', p.name)}
+                <div>
+                    <h1 style="font-size:1.2rem; font-weight:800;">${p.name}</h1>
+                    <div style="font-size:1.25rem; font-weight:800; color:var(--accent-text); margin:6px 0;">${money(p.price)}</div>
+                    <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.7; margin-bottom:16px;">${p.desc}</p>
+                 
+                    <div style="margin-bottom:16px;">
+                        <span style="font-weight:700; font-size:0.85rem;">المقاس: <span id="sizeLabel" style="color:var(--accent-text);">لم يتم الاختيار</span></span>
+                        <div class="sizes-group" role="group" aria-label="المقاسات المتاحة">
+                          ${(p.sizeMode === 'standard'
+    ? ['Standard']
+    : (Array.isArray(p.sizes) && p.sizes.length
+        ? p.sizes
+        : ['M', 'L', 'XL', 'XXL', 'XXXL']
+    )
+).map(size => `<button type="button" class="size-option" aria-pressed="false" data-size="${size}">${size}</button>`).join('')}
                         </div>
+                        <small style="display:block; color:var(--text-muted); font-size:.75rem;">اختاري المقاس المناسب قبل إضافة العباية إلى الحقيبة.</small>
                     </div>
-                `;
-            }).join('');
-
-            setTimeout(triggerScrollReveal, 50);
-        }
-
-        function openPDP(id) {
-            activeProduct = products.find(p => p.id === id);
-            if (!activeProduct) return;
-
-            selectedColor = activeProduct.colors[0].name;
-
-            const pdpContent = document.getElementById('pdpContent');
-            pdpContent.innerHTML = `
-                ${generateCarouselHTML(activeProduct.id, activeProduct.images, true)}
-
-                <h1 style="font-size:1.2rem; font-weight:800; margin-top:16px;">${activeProduct.name}</h1>
-                <div style="font-size:1.25rem; font-weight:800; color:var(--accent); margin: 6px 0;">${activeProduct.price} ر.س</div>
-                <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.6; margin-bottom:16px;">${activeProduct.desc}</p>
-
-                <div style="margin-bottom:16px;">
-                    <label style="font-weight:700; font-size:0.85rem;">اللون المختار: <span id="colorLabel" style="color:var(--accent);">${selectedColor}</span></label>
-                    <div class="colors-group">
-                        ${activeProduct.colors.map((c, idx) => `
-                            <div class="color-circle ${idx === 0 ? 'active' : ''}" 
-                                 style="background-color: ${c.hex};" 
-                                 title="${c.name}"
-                                 onclick="selectColor(this, '${c.name}')">
-                            </div>
-                        `).join('')}
-                    </div>
+                    <button class="btn btn-accent" onclick="addToCartCurrent()"><i class="fa-solid fa-bag-shopping"></i> إضافة إلى الحقيبة</button>
                 </div>
+            </div>`;
+            document.querySelectorAll('#pdpContent .size-option').forEach(button => {
+    button.addEventListener('click', () => {
+        selectSize(button, button.dataset.size);
+    });
+});
 
-                <button class="btn btn-accent" onclick="addToCartCurrent()"><i class="fa-solid fa-bag-shopping"></i> إضافة إلى الحقيبة</button>
-            `;
-
-            const related = products.filter(p => p.id !== activeProduct.id);
-            const relatedGrid = document.getElementById('relatedProductsGrid');
-            relatedGrid.innerHTML = related.map(p => `
-                <div class="product-card">
-                    ${generateCarouselHTML(p.id, p.images, false)}
-                    <div class="card-info">
-                        <div class="card-title">${p.name}</div>
-                        <div class="card-price">${p.price} ر.س</div>
-                    </div>
-                </div>
-            `).join('');
-
-            showPage('pdpPage');
+if (p.sizeMode === 'standard') {
+    const standardButton = document.querySelector('#pdpContent .size-option');
+    if (standardButton) selectSize(standardButton, 'Standard');
+}
+            $('relatedProductsGrid').innerHTML = products.filter(x => x.id !== id).map((x, i) => productCard(x, 'related', i)).join('');
+            return true;
+        }
+       
+        function selectSize(el, size) {
+            document.querySelectorAll('#pdpContent .size-option').forEach(b => {
+                const active = b === el;
+                b.classList.toggle('active', active);
+                b.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            selectedSize = size;
+            $('sizeLabel').innerText = size;
         }
 
-        function selectColor(el, colorName) {
-            document.querySelectorAll('.color-circle').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            selectedColor = colorName;
-            const label = document.getElementById('colorLabel');
-            if(label) label.innerText = colorName;
+        /* المفضلة: تحديث القلوب في مكانها دون إعادة بناء القائمة */
+        function toggleWishlist(id, e) {
+            if (e) e.stopPropagation();
+            const on = !wishlist.includes(id);
+            wishlist = on ? [...wishlist, id] : wishlist.filter(w => w !== id);
+            store.set('zomoroda_wishlist', wishlist);
+            document.querySelectorAll(`[data-wish="${id}"]`).forEach(b => {
+                b.classList.toggle('active', on); b.setAttribute('aria-pressed', on);
+                b.firstElementChild.className = `fa-${on ? 'solid' : 'regular'} fa-heart`;
+            });
+            showToast(on ? 'تمت إضافة المنتج للمفضلة ❤️' : 'تمت إزالة المنتج من المفضلة');
+            updateBadges(); renderWishlist();
         }
-
-        function toggleWishlist(id, event) {
-            if(event) event.stopPropagation();
-            const idx = wishlist.indexOf(id);
-            if (idx > -1) {
-                wishlist.splice(idx, 1);
-                showToast('تمت إزالة المنتج من المفضلة');
-            } else {
-                wishlist.push(id);
-                showToast('تمت إضافة المنتج للمفضلة ❤️');
-            }
-            localStorage.setItem('zomoroda_wishlist', JSON.stringify(wishlist));
-            updateBadges();
-            renderProducts(products);
-            renderWishlist();
-        }
-
         function renderWishlist() {
-            const list = document.getElementById('wishlistList');
-            const wishProducts = products.filter(p => wishlist.includes(p.id));
-
-            if (wishProducts.length === 0) {
-                list.innerHTML = `<p style="text-align:center; padding: 40px 0; color: var(--text-muted);">لا توجد عناصر بالمفضلة حتى الآن.</p>`;
-                return;
-            }
-
-            list.innerHTML = wishProducts.map(p => `
+            const items = wishlist.map(byId);
+            $('wishlistList').innerHTML = items.length ? items.map(p => `
                 <div class="cart-item">
-                    <img src="${p.images[0]}">
+                    <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
                     <div style="flex:1;">
                         <div style="font-weight:700; font-size:0.85rem;">${p.name}</div>
-                        <div style="color:var(--accent); font-weight:800;">${p.price} ر.س</div>
+                        <div style="color:var(--accent-text); font-weight:800;">${money(p.price)}</div>
                     </div>
-                    <button class="btn btn-primary" style="width:auto; padding: 8px 14px; font-size:0.75rem;" onclick="openPDP('${p.id}')">عرض</button>
-                    <button onclick="toggleWishlist('${p.id}')" style="background:none; border:none; color:#ccc; cursor:pointer; padding: 0 8px;"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
+                    <button class="btn btn-primary" style="width:auto; padding:8px 14px; font-size:0.75rem;" onclick="openPDP('${p.id}')">عرض</button>
+                    <button class="icon-btn" aria-label="إزالة من المفضلة" onclick="toggleWishlist('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+                </div>`).join('')
+                : `<p style="text-align:center; padding:40px 0; color:var(--text-muted);">لا توجد عناصر بالمفضلة حتى الآن.</p>`;
         }
 
-        function triggerCartIconAnimation() {
-            const cartBtn = document.getElementById('cartHeaderBtn');
-            cartBtn.classList.remove('cart-shake');
-            void cartBtn.offsetWidth; 
-            cartBtn.classList.add('cart-shake');
-        }
-
+        /* السلة */
         function addToCartCurrent() {
-            const existing = cart.find(i => i.id === activeProduct.id && i.color === selectedColor);
-            if (existing) {
-                existing.qty += 1;
-            } else {
-                cart.push({
-                    id: activeProduct.id,
-                    name: activeProduct.name,
-                    price: activeProduct.price,
-                    color: selectedColor,
-                    image: activeProduct.images[0],
-                    qty: 1
-                });
+            if (!selectedSize) {
+                showToast('اختاري المقاس أولاً من فضلكِ');
+                $('sizeLabel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
             }
-            saveCart();
-            triggerCartIconAnimation();
+            const ex = cart.find(i => i.id === activeProduct.id && i.size === selectedSize);
+if (ex) ex.qty++;
+else cart.push({ id: activeProduct.id, size: selectedSize, qty: 1 });
+            saveCart(); triggerCartIconAnimation();
             showToast('تمت إضافة العباية إلى الحقيبة 🛍️');
             showPage('cartPage');
         }
-
-        function updateCartQty(index, delta) {
-            cart[index].qty += delta;
-            if (cart[index].qty <= 0) cart.splice(index, 1);
-            saveCart();
-        }
-
-        function removeCartItem(index) {
-            cart.splice(index, 1);
-            saveCart();
-        }
-
-        function saveCart() {
-            localStorage.setItem('zomoroda_cart', JSON.stringify(cart));
-            updateBadges();
-            renderCart();
-        }
-
+        function updateCartQty(i, d) { cart[i].qty += d; if (cart[i].qty <= 0) cart.splice(i, 1); saveCart(); }
+        function removeCartItem(i) { cart.splice(i, 1); saveCart(); }
+        function saveCart() { store.set('zomoroda_cart', cart); updateBadges(); renderCart(); }
         function renderCart() {
-            const list = document.getElementById('cartItemsList');
-            const summary = document.getElementById('cartSummary');
-
-            if (cart.length === 0) {
-                list.innerHTML = `<p style="text-align:center; padding: 40px 0; color: var(--text-muted);">حقيبة التسوق فارغة حالياً</p>`;
-                summary.style.display = 'none';
-                return;
-            }
-
-            summary.style.display = 'block';
-            let total = 0;
-
-            list.innerHTML = cart.map((item, idx) => {
-                const itemTotal = item.price * item.qty;
-                total += itemTotal;
+            $('cartSummary').style.display = cart.length ? 'block' : 'none';
+            $('cartItemsList').innerHTML = cart.length ? cart.map((it, i) => {
+                const p = byId(it.id);
                 return `
-                    <div class="cart-item">
-                        <img src="${item.image}">
-                        <div style="flex:1;">
-                            <div style="font-weight:700; font-size:0.85rem;">${item.name}</div>
-                            <div style="font-size:0.75rem; color:var(--text-muted);">اللون: ${item.color}</div>
-                            <div style="font-weight:800; color:var(--accent);">${itemTotal} ر.س</div>
-                            <div class="cart-controls">
-                                <button onclick="updateCartQty(${idx}, -1)">-</button>
-                                <span>${item.qty}</span>
-                                <button onclick="updateCartQty(${idx}, 1)">+</button>
-                            </div>
+                <div class="cart-item">
+                    <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+                    <div style="flex:1;">
+                        <div style="font-weight:700; font-size:0.85rem;">${p.name}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">المقاس: ${it.size || 'غير محدد'}</div>
+                        <div style="font-weight:800; color:var(--accent-text);">${money(p.price * it.qty)}</div>
+                        <div class="cart-controls">
+                            <button aria-label="إنقاص الكمية" onclick="updateCartQty(${i}, -1)">-</button>
+                            <span>${it.qty}</span>
+                            <button aria-label="زيادة الكمية" onclick="updateCartQty(${i}, 1)">+</button>
                         </div>
-                        <button onclick="removeCartItem(${idx})" style="background:none; border:none; color:red; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                `;
-            }).join('');
-
-            document.getElementById('cartTotal').innerText = `${total} ر.س`;
+                    <button class="icon-btn" style="color:var(--danger);" aria-label="حذف من الحقيبة" onclick="removeCartItem(${i})"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            }).join('') : `<p style="text-align:center; padding:40px 0; color:var(--text-muted);">حقيبة التسوق فارغة حالياً</p>`;
+            $('cartTotal').innerText = money(cart.reduce((s, i) => s + byId(i.id).price * i.qty, 0));
         }
-
         function updateBadges() {
-            document.getElementById('cartBadge').innerText = cart.reduce((sum, i) => sum + i.qty, 0);
-            document.getElementById('wishlistBadge').innerText = wishlist.length;
+            $('cartBadge').innerText = cart.reduce((s, i) => s + i.qty, 0);
+            $('wishlistBadge').innerText = wishlist.length;
         }
 
-        function openImageModal(src) {
+                function openImageModal(src) {
             document.getElementById('modalImg').src = src;
             document.getElementById('imageModal').style.display = 'flex';
         }
@@ -908,9 +806,9 @@
             return phoneRegex.test(phone);
         }
 
-        function processWhatsAppOrder(e) {
+        async function processWhatsAppOrder(e) {
             e.preventDefault();
-            if (cart.length === 0) return alert('السلة فارغة!');
+            if (!cart.length) return showToast('حقيبة التسوق فارغة');
 
             const phoneInput = document.getElementById('custPhone');
             const phoneError = document.getElementById('phoneError');
@@ -923,27 +821,116 @@
                 return;
             }
 
-            const name = document.getElementById('custName').value;
-            const city = document.getElementById('custCity').value;
-            const address = document.getElementById('custAddress').value;
+            const name = document.getElementById('custName').value.trim();
+            const city = document.getElementById('custCity').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
 
             let itemsText = "";
             let grandTotal = 0;
 
-            cart.forEach((item) => {
+            cart.forEach((it) => { const item = { ...byId(it.id), ...it };
                 const totalItemPrice = item.price * item.qty;
                 grandTotal += totalItemPrice;
                 itemsText += `- اسم المنتج: ${item.name}\n`;
-                itemsText += `  اللون المختار: ${item.color}\n`;
+                itemsText += `  المقاس: ${item.size || 'غير محدد'}\n`;
                 itemsText += `  الكمية: ${item.qty}\n`;
-                itemsText += `  السعر: ${totalItemPrice} ر.س\n\n`;
+                itemsText += `  السعر: ${money(totalItemPrice)}\n\n`;
             });
 
-            const message = `مرحباً متجر ZOMORODA.BOUTIQUE، أريد طلب المنتجات التالية:\n\n${itemsText}المجموع النهائي: ${grandTotal} ر.س\n\nالاسم: ${name}\nرقم الهاتف: ${phoneValue}\nالمدينة: ${city}\nالعنوان: ${address}\n\nشكراً لكم.`;
+            const message = `مرحباً متجر ZOMORODA.BOUTIQUE، أريد طلب المنتجات التالية:\n\n${itemsText}المجموع النهائي: ${money(grandTotal)}\n\nالاسم: ${name}\nرقم الهاتف: ${phoneValue}\nالمدينة: ${city}\nالعنوان: ${address}\n\nشكراً لكم.`;
 
             const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
+const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+
+const whatsappWindow = window.open('about:blank', '_blank');
+
+try {
+    const orderItems = cart.map(it => {
+        const p = byId(it.id);
+
+        return {
+            productId: it.id,
+            name: p.name,
+            price: p.price,
+            size: it.size || "غير محدد",
+            quantity: it.qty
+        };
+    });
+
+    await window.saveCustomerOrder({
+        name,
+        phone: phoneValue,
+        city,
+        address,
+        items: orderItems,
+        total: grandTotal
+    });
+
+    if (whatsappWindow) {
+        whatsappWindow.location.href = whatsappUrl;
+    } else {
+        window.location.href = whatsappUrl;
+    }
+
+    showToast("تم تسجيل الطلب بنجاح.");
+
+} catch (error) {
+    if (whatsappWindow) whatsappWindow.close();
+
+    console.error("Order error:", error);
+    alert("تعذر تسجيل الطلب في المتجر: " + error.message);
+}
         }
-    </script>
+   </script>
+   <script type="module" src="./firebase.js"></script>
+   <script type="module">
+import "./firebase.js";
+
+import {
+    collection,
+    getDocs,
+    addDoc,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+window.saveCustomerOrder = async function(orderData) {
+    return await addDoc(collection(window.firebaseDb, "orders"), {
+        ...orderData,
+        status: "جديد",
+        createdAt: serverTimestamp()
+    });
+};
+
+try {
+    const db = window.firebaseDb;
+    const snap = await getDocs(collection(db, "products"));
+
+    if (!snap.empty) {
+        const remoteProducts = snap.docs.map(item => {
+            const p = item.data();
+
+            return {
+                id: item.id,
+                name: p.name || "",
+                price: Number(p.price) || 0,
+                tag: p.tag || "new",
+                desc: p.desc || "",
+                images: p.images || [],
+                colors: p.colors || [],
+                sizeMode: p.sizeMode || "custom",
+                sizes: p.sizeMode === "standard"
+                    ? ["Standard"]
+                    : (p.sizes?.length ? p.sizes : ["M", "L", "XL", "XXL", "XXXL"])
+            };
+        }).filter(p => p.images.length > 0);
+
+        if (remoteProducts.length && window.replaceStoreProducts) {
+            window.replaceStoreProducts(remoteProducts);
+        }
+    }
+} catch (error) {
+    console.error("خطأ في تحميل المنتجات من Firebase:", error);
+}
+</script>
 </body>
 </html>
